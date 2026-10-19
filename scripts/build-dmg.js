@@ -42,12 +42,21 @@ if (!fs.existsSync(appBundle)) {
   throw new Error(`Expected application bundle not found at: ${appBundle}`);
 }
 
-console.log("2. Configuring Info.plist (LSUIElement=true)...");
+console.log("2. Configuring Info.plist (LSUIElement, Camera/Mic permissions, ATS)...");
 const infoPlistPath = path.join(appBundle, "Contents", "Info.plist");
 if (fs.existsSync(infoPlistPath)) {
   let plist = fs.readFileSync(infoPlistPath, "utf8");
   if (!plist.includes("<key>LSUIElement</key>")) {
     plist = plist.replace("<dict>", "<dict>\n    <key>LSUIElement</key>\n    <true/>");
+  }
+  if (!plist.includes("<key>NSCameraUsageDescription</key>")) {
+    plist = plist.replace("<dict>", "<dict>\n    <key>NSCameraUsageDescription</key>\n    <string>FloatCam needs camera access for floating preview.</string>");
+  }
+  if (!plist.includes("<key>NSMicrophoneUsageDescription</key>")) {
+    plist = plist.replace("<dict>", "<dict>\n    <key>NSMicrophoneUsageDescription</key>\n    <string>FloatCam microphone access.</string>");
+  }
+  if (!plist.includes("<key>NSAppTransportSecurity</key>")) {
+    plist = plist.replace("<dict>", "<dict>\n    <key>NSAppTransportSecurity</key>\n    <dict>\n      <key>NSAllowsArbitraryLoads</key>\n      <true/>\n      <key>NSAllowsLocalNetworking</key>\n      <true/>\n    </dict>");
   }
   fs.writeFileSync(infoPlistPath, plist);
 }
