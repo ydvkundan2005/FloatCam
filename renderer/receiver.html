@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self' blob:; connect-src wss: https:; base-uri 'none'; form-action 'none';"
+  />
+  <title>Floating Phone Camera</title>
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+  <div id="shape" class="shape-container">
+    <video id="remoteVideo" autoplay playsinline muted></video>
+    <div id="overlay" class="overlay">
+      <div class="overlay-dot"></div>
+      <div class="overlay-text" id="overlayText">Waiting for phone…</div>
+    </div>
+    <div id="resizeHandle" class="resize-handle" title="Drag to resize"></div>
+  </div>
+  <script src="../shared/shapes.js"></script>
+  <script src="receiver.js"></script>
+</body>
+</html>

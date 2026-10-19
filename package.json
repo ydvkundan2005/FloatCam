@@ -1,0 +1,40 @@
+{
+  "name": "floatcam",
+  "productName": "FloatCam",
+  "version": "1.0.0",
+  "description": "Cross-platform floating phone camera utility using WebRTC over local Wi-Fi.",
+  "main": "main.js",
+  "author": "FloatCam Contributors",
+  "license": "MIT",
+  "keywords": [
+    "electron",
+    "webrtc",
+    "webcam",
+    "phone-camera",
+    "floating-camera",
+    "camera-utility",
+    "macos",
+    "windows"
+  ],
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/*.test.js",
+    "cert": "node scripts/generate-certs.js",
+    "build:mac": "node scripts/build-dmg.js",
+    "build:win": "node scripts/build-windows.js",
+    "build:ico": "node scripts/build-ico.js",
+    "build:assets": "node scripts/generate-assets.js && node scripts/render-icons.js"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@electron/asar": "^3.2.11",
+    "@electron/packager": "^18.3.6",
+    "electron": "^32.3.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

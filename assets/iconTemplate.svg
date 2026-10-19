@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" width="22" height="22">
+  <!-- Minimalist menu-bar camera icon with floating indicator -->
+  <!-- Camera body -->
+  <path d="M 4 7 C 2.9 7 2 7.9 2 9 L 2 17 C 2 18.1 2.9 19 4 19 L 18 19 C 19.1 19 20 18.1 20 17 L 20 9 C 20 7.9 19.1 7 18 7 L 15.5 7 L 14.5 5 L 7.5 5 L 6.5 7 Z" fill="#000000" />
+  <!-- Lens cutout -->
+  <circle cx="11" cy="13" r="3.6" fill="none" stroke="#FFFFFF" stroke-width="1.8" />
+  <circle cx="11" cy="13" r="1.4" fill="#FFFFFF" />
+  <!-- Top wireless signal arc -->
+  <path d="M 8.5 2.5 A 3.5 3.5 0 0 1 13.5 2.5" fill="none" stroke="#000000" stroke-width="1.6" stroke-linecap="round" />
+</svg>

@@ -1,0 +1,101 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+  width: 100%;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* The shape container is the thing the clip-path / border-radius is applied
+   to. It fills the whole (transparent) BrowserWindow, so visually the
+   window appears to *be* whatever shape is selected. */
+.shape-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #0b0b0c;
+  -webkit-app-region: drag;
+}
+
+video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: center center;
+  transition: transform 0.12s ease-out;
+  pointer-events: none;
+  background: #0b0b0c;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(18, 18, 20, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  text-align: center;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.overlay.visible {
+  opacity: 1;
+}
+
+.overlay-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ff9f0a;
+  box-shadow: 0 0 8px rgba(255, 159, 10, 0.85);
+}
+
+.overlay-text {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  max-width: 92%;
+  line-height: 1.4;
+}
+
+.resize-handle {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 18px;
+  height: 18px;
+  -webkit-app-region: no-drag;
+  cursor: nwse-resize;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 20;
+}
+
+.shape-container:hover .resize-handle {
+  opacity: 0.6;
+}
+
+.resize-handle::before {
+  content: '';
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid rgba(255, 255, 255, 0.95);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.95);
+}

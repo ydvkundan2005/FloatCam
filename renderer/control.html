@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none';"
+  />
+  <title>Floating Phone Camera — Dashboard</title>
+  <link rel="stylesheet" href="control.css" />
+</head>
+<body>
+  <div class="panel">
+    <!-- Header -->
+    <header class="panel-header">
+      <div class="app-branding">
+        <div class="app-logo">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M4 7C2.9 7 2 7.9 2 9v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2h-2.5L14.5 5h-7L6.5 7H4zm7 9a4 4 0 110-8 4 4 0 010 8z"/>
+          </svg>
+        </div>
+        <div class="app-title-group">
+          <span class="app-title">Floating Camera</span>
+          <span class="app-badge">v1.0</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="serverToggleBtn" class="pill-btn on" title="Start/Stop Server">
+          <span class="pill-dot"></span>
+          <span id="serverToggleText">Server Running</span>
+        </button>
+        <button id="quitBtn" class="icon-btn" title="Quit Application">&#9099;</button>
+      </div>
+    </header>
+
+    <!-- macOS Segmented Control Tab Bar -->
+    <nav class="tab-bar">
+      <button class="tab-btn active" data-tab="tab-connect">Connect</button>
+      <button class="tab-btn" data-tab="tab-controls">Controls</button>
+      <button class="tab-btn" data-tab="tab-troubleshoot">Help & SSL</button>
+    </nav>
+
+    <!-- ================= TAB 1: CONNECT ================= -->
+    <main id="tab-connect" class="tab-content active">
+      <!-- Status Card -->
+      <section class="card status-card">
+        <div class="status-top">
+          <div class="status-indicator-group">
+            <span class="status-dot pulse" id="statusDot"></span>
+            <div class="status-text-wrap">
+              <span class="status-title" id="statusLabel">Checking network…</span>
+              <span class="status-sub" id="statusHint">Initializing local connection</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connected Devices List -->
+        <div class="devices-section" id="devicesSection">
+          <div class="section-label">Connected Devices</div>
+          <div id="deviceList" class="device-list">
+            <div class="empty-devices">No phone connected yet</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- QR Code Section -->
+      <section class="card qr-card">
+        <div class="qr-container">
+          <div class="qr-wrapper">
+            <img id="qrImage" class="qr-image" alt="QR Code to connect phone" />
+          </div>
+        </div>
+        <div class="qr-caption">Scan with your iPhone or Android camera</div>
+
+        <!-- URL Display & Controls -->
+        <div class="url-box">
+          <code id="phoneUrl" class="url-code">https://…</code>
+          <div class="url-actions">
+            <button id="copyUrlBtn" class="action-btn" title="Copy URL to clipboard">Copy</button>
+            <button id="openUrlBtn" class="action-btn secondary" title="Open in Mac browser">Open</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Network Interface & Camera Quick Selector -->
+      <section class="card options-card">
+        <div class="option-row">
+          <label for="ifaceSelect" class="option-label">Wi-Fi / LAN Network</label>
+          <select id="ifaceSelect" class="select-dropdown"></select>
+        </div>
+        <div class="divider"></div>
+        <div class="quick-toggle-row">
+          <label class="toggle-wrap" for="macCamToggle">
+            <input type="checkbox" id="macCamToggle" class="toggle" />
+            <span class="toggle-text">Use Mac Webcam</span>
+          </label>
+          <button id="remoteSwitchBtn" class="small-action-btn" title="Flip connected phone camera" disabled>
+            Flip Phone Camera
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- ================= TAB 2: CONTROLS ================= -->
+    <main id="tab-controls" class="tab-content">
+      <!-- Window Visibility & Always on Top -->
+      <section class="card control-group">
+        <div class="control-row">
+          <label for="visibleToggle">Show Floating Preview</label>
+          <input type="checkbox" id="visibleToggle" class="toggle" />
+        </div>
+        <div class="divider"></div>
+        <div class="control-row">
+          <label for="alwaysOnTopToggle">Always on Top</label>
+          <input type="checkbox" id="alwaysOnTopToggle" class="toggle" />
+        </div>
+      </section>
+
+      <!-- Shape Grid -->
+      <section class="card control-group">
+        <div class="group-header">
+          <span class="group-title">Preview Shape</span>
+        </div>
+        <div class="shape-grid" id="shapeGrid"></div>
+      </section>
+
+      <!-- Sliders: Zoom, Size, Opacity -->
+      <section class="card control-group">
+        <div class="group-header">
+          <span class="group-title">Zoom</span>
+          <span class="slider-badge" id="zoomValue">1.0×</span>
+        </div>
+        <div class="slider-row">
+          <button class="stepper-btn" id="zoomOutBtn" title="Zoom out">&minus;</button>
+          <input type="range" id="zoomSlider" min="1" max="3" step="0.05" class="custom-range" />
+          <button class="stepper-btn" id="zoomInBtn" title="Zoom in">+</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="group-header">
+          <span class="group-title">Window Size</span>
+          <span class="slider-badge" id="sizeValue">220 px</span>
+        </div>
+        <input type="range" id="sizeSlider" min="120" max="480" step="4" class="custom-range" />
+
+        <div class="divider"></div>
+
+        <div class="group-header">
+          <span class="group-title">Opacity</span>
+          <span class="slider-badge" id="opacityValue">100%</span>
+        </div>
+        <input type="range" id="opacitySlider" min="10" max="100" step="1" class="custom-range" />
+      </section>
+
+      <!-- Quick Corner Snapping -->
+      <section class="card control-group">
+        <div class="group-header">
+          <span class="group-title">Corner Snapping</span>
+        </div>
+        <div class="position-grid">
+          <button class="pos-btn" data-corner="top-left" title="Top Left">↖ Top Left</button>
+          <button class="pos-btn" data-corner="top-right" title="Top Right">↗ Top Right</button>
+          <button class="pos-btn" data-corner="bottom-left" title="Bottom Left">↙ Bottom Left</button>
+          <button class="pos-btn" data-corner="bottom-right" title="Bottom Right">↘ Bottom Right</button>
+        </div>
+      </section>
+
+      <div class="panel-bottom-action">
+        <button id="resetBtn" class="text-btn">Reset to Default View</button>
+      </div>
+    </main>
+
+    <!-- ================= TAB 3: TROUBLESHOOT & SSL ================= -->
+    <main id="tab-troubleshoot" class="tab-content">
+      <!-- Certificate & Security -->
+      <section class="card guide-card">
+        <div class="guide-header">
+          <div class="guide-icon">🛡️</div>
+          <div>
+            <div class="guide-title">Local HTTPS & Trust</div>
+            <div class="guide-sub">Camera access requires a secure local context</div>
+          </div>
+        </div>
+        <p class="guide-desc">
+          FPC generates a local Certificate Authority matching your Mac's active IP address.
+        </p>
+        <div class="btn-cluster">
+          <button id="downloadCaBtn" class="action-btn">Install Root CA Profile</button>
+          <button id="regenCertsBtn" class="action-btn secondary">Regenerate Certs</button>
+        </div>
+      </section>
+
+      <!-- Browser Specific Guides -->
+      <section class="card guide-card">
+        <div class="guide-title">Mobile Browser Connection</div>
+        
+        <div class="browser-item">
+          <div class="browser-name">📱 Apple Safari (iOS)</div>
+          <div class="browser-steps">
+            1. Scan QR code or visit HTTPS link.<br/>
+            2. Tap <strong>Show Details</strong> &rarr; <strong>visit this website</strong> &rarr; <strong>Visit Website</strong>.<br/>
+            3. Tap <strong>Start Camera</strong> and select <strong>Allow</strong>.
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="browser-item">
+          <div class="browser-name">🤖 Google Chrome (Android)</div>
+          <div class="browser-steps">
+            1. Open the camera link.<br/>
+            2. Tap <strong>Advanced</strong> &rarr; <strong>Proceed to [IP] (unsafe)</strong>.<br/>
+            3. Allow camera permissions when prompted.
+          </div>
+        </div>
+      </section>
+
+      <!-- Network Checklist -->
+      <section class="card guide-card">
+        <div class="guide-title">Network Checklist</div>
+        <ul class="checklist">
+          <li>Both Mac and Phone must be on the <strong>same Wi-Fi network</strong>.</li>
+          <li>Avoid Public / Guest Wi-Fi with client isolation.</li>
+          <li>Ensure Mac Firewall allows incoming connections on port <strong>9211</strong>.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <script src="../shared/shapes.js"></script>
+  <script src="control.js"></script>
+</body>
+</html>

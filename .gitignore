@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Build outputs & installers
+dist/
+dist-win/
+dist-mac/
+out/
+build-artifacts/
+*.app
+*.dmg
+*.zip
+*.exe
+*.msi
+
+# SSL / TLS certificates & private keys (auto-generated locally on first launch)
+certs/*
+!certs/.gitkeep
+
+# Local user runtime settings
+settings.json
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor & IDE configurations
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local environment secrets
+.env
+.env.local
