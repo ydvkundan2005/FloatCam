@@ -1,71 +1,65 @@
+<div align="center">
+
+<img src="assets/icon.png" width="120" alt="FloatCam Icon" />
+
 # FloatCam
 
-> Turn your smartphone into a wireless, floating desktop webcam with zero cloud dependencies and sub-second WebRTC latency.
+**Turn your smartphone into a wireless, floating desktop webcam.**  
+Sub-second WebRTC latency · 100% private · Zero cloud · Free & Open Source
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey.svg)](docs/PACKAGING.md)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](package.json)
 [![Electron](https://img.shields.io/badge/electron-32.3.3-blue.svg)](package.json)
+[![Version](https://img.shields.io/badge/version-v3.0.0-purple.svg)](https://github.com/ydvkundan2005/FloatCam/releases/tag/v3.0)
+
+**[🌐 Website](https://ydvkundan2005.github.io/FloatCam)** · **[⬇ Download for Mac](https://github.com/ydvkundan2005/FloatCam/releases/download/v3.0/FloatCam-v3.dmg)** · **[⬇ Download for Windows](https://github.com/ydvkundan2005/FloatCam/releases/download/v3.0/FloatCam-Setup-v3.exe)** · **[📋 All Releases](https://github.com/ydvkundan2005/FloatCam/releases)**
+
+</div>
 
 ---
 
-## 🌟 Highlights & Features
+## 🌟 What is FloatCam?
 
-- **📱 Wireless Smartphone Webcam**: Stream your iPhone (Safari) or Android (Chrome) camera directly to your desktop over local Wi-Fi.
-- **⚡ Sub-Second Latency**: Direct peer-to-peer WebRTC streaming with adaptive hardware acceleration.
-- **🛡️ 100% Private & Local**: Zero cloud relays, zero accounts, and zero telemetry. All video packets stay within your local network.
-- **🪟 Customizable Floating Preview**: Always-on-top, transparent, frameless preview window that never gets buried behind other apps.
-- **🎨 10 Geometric Window Shapes**: Circle, Squircle, Rounded Rectangle, Hexagon, Heart, Star, Diamond, Octagon, Square, and Standard 16:9 Rectangle.
-- **🔍 Real-Time Transforms**: Live digital zoom slider (1.0× to 3.0×), opacity slider (10% to 100%), and interactive corner drag-to-resize.
-- **📍 Quick Corner Snapping**: One-click instant positioning (↖ Top Left, ↗ Top Right, ↙ Bottom Left, ↘ Bottom Right).
-- **📶 Instant QR Connection**: Just point your phone's default Camera app at the on-screen QR code—no mobile app installation required.
-- **💻 Built-in Mac Webcam Fallback**: Toggle to your computer's FaceTime / integrated camera when needed.
-- **🖥️ Native Menu Bar & System Tray**: Runs as an unobtrusive background utility on both macOS (`LSUIElement`) and Windows (System Tray).
+FloatCam is a free, open-source Electron app that lets you use your **iPhone or Android phone as a wireless webcam** on your Mac or Windows PC — with zero cloud dependencies and sub-second latency.
+
+Your phone's camera streams directly to a beautiful **always-on-top floating window** on your desktop via WebRTC over your local Wi-Fi. No apps to install on your phone. No accounts. No data leaves your network.
 
 ---
 
-## 🏗️ Architecture
+## ✨ Features
 
-```
-+-------------------------------------------------------------+
-|                  Mobile Browser Web Client                  |
-|          (iOS Safari / Android Chrome getUserMedia)         |
-+------------------------------+------------------------------+
-                               |
-                      HTTPS / WSS / WebRTC
-                      (Local Wi-Fi / LAN)
-                               |
-+------------------------------v------------------------------+
-|                   Built-in Signaling Server                 |
-|             (Node.js HTTPS + WebSocket on :9211)            |
-+------------------------------+------------------------------+
-                               |
-                      Electron Main Process
-                       (main.js / IPC Bus)
-                               |
-           +-------------------+-------------------+
-           |                                       |
-+----------v------------+              +-----------v----------+
-|  Preview Window       |              |  Control Dashboard   |
-|  (Floating Camera)    |              |  (Menu Bar Popover)  |
-+-----------------------+              +----------------------+
-```
-
-For in-depth details, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+| Feature | Description |
+|---|---|
+| 📱 **Wireless Streaming** | iPhone (Safari) or Android (Chrome) over local Wi-Fi |
+| ⚡ **Sub-Second Latency** | Direct P2P WebRTC with adaptive hardware acceleration |
+| 🛡️ **100% Private** | Zero cloud relays, zero accounts, zero telemetry |
+| 🪟 **Floating Preview** | Always-on-top, transparent, frameless window |
+| 🎨 **10 Window Shapes** | Circle, Squircle, Hexagon, Heart, Star, Diamond, Octagon, Rounded Rect, Square, 16:9 |
+| 🔍 **Live Zoom & Opacity** | Zoom 1.0×–3.0×, Opacity 10%–100%, drag-to-resize |
+| 📍 **Corner Snapping** | One-click snap to any corner of your screen |
+| 📶 **QR Code Connection** | Point your phone camera at QR — no app install needed |
+| 💻 **Mac Webcam Fallback** | Toggle to FaceTime / integrated camera anytime |
+| 🖥️ **Menu Bar / Tray** | Unobtrusive background utility on macOS & Windows |
 
 ---
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Node.js >= 18.0.0
-- npm >= 9.0.0
+### Download Installers (Recommended)
 
-### Installation & Run
+| Platform | Download | Size |
+|---|---|---|
+| 🍎 **macOS** (Apple Silicon + Intel) | [FloatCam-v3.dmg](https://github.com/ydvkundan2005/FloatCam/releases/download/v3.0/FloatCam-v3.dmg) | ~104 MB |
+| 🪟 **Windows** x64 | [FloatCam-Setup-v3.exe](https://github.com/ydvkundan2005/FloatCam/releases/download/v3.0/FloatCam-Setup-v3.exe) | ~82 MB |
+
+### Build from Source
+
+**Prerequisites:** Node.js ≥ 18.0.0, npm ≥ 9.0.0
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/username/FloatCam.git
+# 1. Clone the repo
+git clone https://github.com/ydvkundan2005/FloatCam.git
 cd FloatCam
 
 # 2. Install dependencies
@@ -79,62 +73,84 @@ npm start
 
 ## 📱 How to Connect Your Phone
 
-1. **Connect to Same Wi-Fi**: Ensure your Mac/PC and phone are on the same Wi-Fi network.
-2. **Open Dashboard**: Click the FloatCam icon in your menu bar (macOS) or system tray (Windows).
-3. **Scan QR Code**: Open your phone camera and scan the displayed QR code (or type the `https://...:9211` link in Safari/Chrome).
-4. **Bypass Local HTTPS Warning**:
-   - **iOS Safari**: Tap **Show Details** -> **visit this website** -> **Visit Website**.
-   - **Android Chrome**: Tap **Advanced** -> **Proceed to <IP> (unsafe)**.
-5. **Tap "Start Camera"**: Allow camera permissions when prompted. Your video feed will appear in the floating window instantly!
+1. **Same Wi-Fi** — Ensure your Mac/PC and phone are on the same Wi-Fi network
+2. **Open Dashboard** — Click the FloatCam icon in your menu bar (macOS) or system tray (Windows)
+3. **Scan QR Code** — Point your phone camera at the displayed QR code
+4. **Bypass HTTPS Warning**:
+   - **iOS Safari**: Tap **Show Details** → **visit this website** → **Visit Website**
+   - **Android Chrome**: Tap **Advanced** → **Proceed to `<IP>` (unsafe)**
+5. **Tap "Start Camera"** — Allow camera permissions. Your video appears instantly!
 
 ---
 
-## 📦 Building Standalone Installers
+## 📦 Building Installers
 
-### macOS DMG Installer
-Generates an ad-hoc signed, compressed `.dmg` installer with `/Applications` shortcut:
 ```bash
+# macOS DMG (generates releases/FloatCam-v3.dmg)
 npm run build:mac
-```
-Output: `dist/FloatCam-macOS.dmg`
 
-### Windows x64 Distribution
-Generates the portable Windows 64-bit application package and distribution `.zip`:
-```bash
+# Windows installer + portable ZIP
 npm run build:win
 ```
-Output: `dist/FloatCam-Windows-x64.zip`
 
-For packaging details, see [docs/PACKAGING.md](docs/PACKAGING.md).
+For details, see [docs/PACKAGING.md](docs/PACKAGING.md).
+
+---
+
+## 🏗️ Architecture
+
+```
+[ Mobile Browser ]  iOS Safari / Android Chrome
+         |
+         |  HTTPS + WSS + WebRTC  (Local Wi-Fi / LAN)
+         |
+[ Signaling Server ]  Node.js HTTPS + WebSocket on :9211
+         |
+[ Electron Main Process ]  main.js / IPC Bus
+         |
+    +----+----+
+    |         |
+[ Preview ]  [ Control Dashboard ]
+  Window      Menu Bar Popover
+```
+
+Full details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
 ---
 
 ## 🧪 Testing
 
-FloatCam includes an automated test suite verifying geometric calculations, settings persistence, IP detection, IPC constants, and SSL certificate managers:
-
 ```bash
 npm test
 ```
 
+Covers: geometric calculations, settings persistence, IP detection, IPC constants, SSL certificate management.
+
 ---
 
-## 📚 Documentation Index
+## 📚 Documentation
 
 - [Architecture & Data Flow](docs/ARCHITECTURE.md)
 - [Development Workflow](docs/DEVELOPMENT.md)
-- [Packaging & Releases (macOS / Windows)](docs/PACKAGING.md)
-- [Security Model & TLS Guide](docs/SECURITY.md)
-- [Troubleshooting & Network Checklist](docs/TROUBLESHOOTING.md)
+- [Packaging & Releases](docs/PACKAGING.md)
+- [Security Model & TLS](docs/SECURITY.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Install Guide](docs/INSTALL-GUIDE.md)
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please check out [CONTRIBUTING.md](CONTRIBUTING.md) before submitting pull requests.
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting pull requests.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License © 2024 FloatCam Contributors — see [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+  <strong>🌐 <a href="https://ydvkundan2005.github.io/FloatCam">Visit FloatCam Website</a></strong>
+</div>

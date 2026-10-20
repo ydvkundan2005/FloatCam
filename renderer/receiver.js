@@ -19,6 +19,7 @@
   let localMacStream = null;
   let isUsingLocalCamera = false;
   let phoneStream = null;
+  let pendingCandidates = [];
 
   // ---- shape / zoom ----
 
@@ -73,7 +74,25 @@
 
   resizeHandle.addEventListener('mousedown', startResize);
 
-  // ---- Local Mac Camera Support ----
+  // Clicking overlay or double clicking preview opens App Dashboard
+  if (overlay) {
+    overlay.style.cursor = 'pointer';
+    overlay.addEventListener('click', () => {
+      if (window.floatingCam && window.floatingCam.showDashboard) {
+        window.floatingCam.showDashboard();
+      }
+    });
+  }
+
+  if (shapeEl) {
+    shapeEl.addEventListener('dblclick', () => {
+      if (window.floatingCam && window.floatingCam.showDashboard) {
+        window.floatingCam.showDashboard();
+      }
+    });
+  }
+
+  // ---- Local Camera Support ----
 
   async function startLocalCamera() {
     isUsingLocalCamera = true;
@@ -88,7 +107,7 @@
       window.floatingCam.reportVideoState(true);
     } catch (err) {
       isUsingLocalCamera = false;
-      setOverlay(true, 'Mac camera permission denied');
+      setOverlay(true, 'Camera permission denied');
     }
   }
 
@@ -114,18 +133,26 @@
   function teardownPeerConnection(nextOverlayText) {
     if (pc) {
       try {
+        // Null out handlers before close to prevent stale callbacks (NEW-13)
+        pc.ontrack        = null;
+        pc.onicecandidate = null;
+        pc.oniceconnectionstatechange = null;
         pc.close();
       } catch (err) {
         /* ignore */
       }
       pc = null;
     }
-    phoneStream = null;
+    pendingCandidates = [];
     if (!isUsingLocalCamera) {
+      // Only null phoneStream and reset UI when not using local camera (NEW-14)
+      phoneStream = null;
       video.srcObject = null;
       window.floatingCam.reportVideoState(false);
       setOverlay(true, nextOverlayText || 'Waiting for phone…');
     }
+    // When local camera is active, preserve phoneStream so stopLocalCamera()
+    // can restore the phone feed when local cam is turned off
   }
 
   function createPeerConnection() {
@@ -166,19 +193,34 @@
             /* ignore */
           }
         }
+        pendingCandidates = [];
         pc = createPeerConnection();
         await pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
         ws.send(JSON.stringify({ type: 'answer', sdp: pc.localDescription }));
+
+        // Drain any ICE candidates received before remote description was ready
+        while (pendingCandidates.length > 0) {
+          const cand = pendingCandidates.shift();
+          try {
+            await pc.addIceCandidate(new RTCIceCandidate(cand));
+          } catch (_) {
+            /* ignore */
+          }
+        }
         break;
       }
       case 'candidate':
-        if (pc) {
-          try {
-            await pc.addIceCandidate(new RTCIceCandidate(msg.candidate));
-          } catch (err) {
-            /* ignore */
+        if (msg.candidate) {
+          if (pc && pc.remoteDescription) {
+            try {
+              await pc.addIceCandidate(new RTCIceCandidate(msg.candidate));
+            } catch (err) {
+              /* ignore */
+            }
+          } else {
+            pendingCandidates.push(msg.candidate);
           }
         }
         break;
@@ -230,9 +272,13 @@
     };
 
     ws.onclose = () => {
+      // Always teardown PC; only update UI when not using local camera
       teardownPeerConnection();
-      if (!intentionalClose && !isUsingLocalCamera) {
-        setOverlay(true, 'Disconnected — retrying…');
+      if (!intentionalClose) {
+        if (!isUsingLocalCamera) {
+          setOverlay(true, 'Disconnected — retrying…');
+        }
+        // Always reconnect in background so phone feed can resume
         scheduleReconnect();
       }
     };
@@ -255,7 +301,7 @@
     window.floatingCam.onConnectionStatus((status) => {
       if (isUsingLocalCamera) return;
       if (!status.serverRunning) {
-        setOverlay(true, 'Server stopped — start via menu bar');
+        setOverlay(true, 'Server stopped — click to open App Dashboard');
       } else if (!status.phoneConnected) {
         setOverlay(true, 'Waiting for phone…');
       }

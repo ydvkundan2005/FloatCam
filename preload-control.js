@@ -15,6 +15,8 @@ contextBridge.exposeInMainWorld('controls', {
   quickPosition: (corner) => ipcRenderer.invoke(CH.QUICK_POSITION, corner),
   resetSettings: () => ipcRenderer.invoke(CH.RESET_SETTINGS),
   quitApp: () => ipcRenderer.send(CH.QUIT_APP),
+  minimizeWindow: () => ipcRenderer.send(CH.WINDOW_MINIMIZE),
+  closeWindow: () => ipcRenderer.send(CH.WINDOW_CLOSE),
 
   // Server & Network controls
   toggleServer: (start) => ipcRenderer.invoke(CH.TOGGLE_SERVER, start),
@@ -22,6 +24,7 @@ contextBridge.exposeInMainWorld('controls', {
   setNetworkInterface: (ifaceName) => ipcRenderer.invoke(CH.SET_NETWORK_INTERFACE, ifaceName),
   disconnectDevice: (sessionId) => ipcRenderer.invoke(CH.DISCONNECT_DEVICE, sessionId),
   toggleLocalCamera: (enabled) => ipcRenderer.invoke(CH.TOGGLE_LOCAL_CAMERA, enabled),
+  switchCamera: () => ipcRenderer.invoke(CH.SWITCH_CAMERA),
   regenerateCerts: () => ipcRenderer.invoke(CH.REGENERATE_CERTS),
 
   copyToClipboard: (text) => {

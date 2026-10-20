@@ -1,7 +1,7 @@
 {
   "name": "floatcam",
   "productName": "FloatCam",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "Cross-platform floating phone camera utility using WebRTC over local Wi-Fi.",
   "main": "main.js",
   "author": "FloatCam Contributors",
@@ -26,15 +26,113 @@
     "build:assets": "node scripts/generate-assets.js && node scripts/render-icons.js"
   },
   "dependencies": {
+    "node-forge": "^1.4.0",
     "qrcode": "^1.5.4",
     "ws": "^8.18.0"
   },
   "devDependencies": {
     "@electron/asar": "^3.2.11",
     "@electron/packager": "^18.3.6",
-    "electron": "^32.3.3"
+    "electron": "^32.3.3",
+    "electron-builder": "^26.15.3"
   },
   "engines": {
     "node": ">=18"
+  },
+  "build": {
+    "appId": "com.floatcam.desktop",
+    "productName": "FloatCam",
+    "copyright": "Copyright © 2024 FloatCam Contributors",
+    "asar": true,
+    "asarUnpack": [],
+    "directories": {
+      "output": "dist/installer"
+    },
+    "files": [
+      "main.js",
+      "preload-control.js",
+      "preload-receiver.js",
+      "assets/**/*",
+      "lib/**/*",
+      "phone/**/*",
+      "renderer/**/*",
+      "shared/**/*",
+      "package.json",
+      "!dist/**/*",
+      "!releases/**/*",
+      "!docs/**/*",
+      "!tests/**/*",
+      "!scripts/**/*",
+      "!certs/**/*.{pem,key,srl,csr,ext}",
+      "!node_modules/**/.bin",
+      "!node_modules/**/test/**",
+      "!node_modules/**/tests/**",
+      "!node_modules/**/*.md"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "portable": {
+      "artifactName": "FloatCam-v3-Portable.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico",
+      "artifactName": "FloatCam-Setup-v3.exe",
+      "shortcutName": "FloatCam",
+      "uninstallDisplayName": "FloatCam V3",
+      "deleteAppDataOnUninstall": false
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["arm64", "x64"]
+        }
+      ],
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.utilities",
+      "darkModeSupport": true,
+      "identity": null,
+      "entitlements": null,
+      "entitlementsInherit": null,
+      "extendInfo": {
+        "NSCameraUsageDescription": "FloatCam needs camera access for the floating preview window.",
+        "NSMicrophoneUsageDescription": "FloatCam microphone access.",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true,
+          "NSAllowsLocalNetworking": true
+        }
+      }
+    },
+    "dmg": {
+      "artifactName": "FloatCam-v3.dmg",
+      "window": {
+        "width": 540,
+        "height": 380
+      },
+      "contents": [
+        { "x": 130, "y": 220 },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+      ]
+    }
   }
 }

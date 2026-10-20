@@ -47,3 +47,30 @@ test("SettingsStore.reset restores defaults", () => {
 
   if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
 });
+
+test("SettingsStore sanitizes corrupt nested size and invalid properties", () => {
+  const tempFile = path.join(os.tmpdir(), "floatcam-test-corrupt-" + Date.now() + ".json");
+  // Write corrupt JSON with invalid size and zoomLevel
+  fs.writeFileSync(tempFile, JSON.stringify({
+    shape: "oval",
+    size: { width: "invalid", height: -50 },
+    zoomLevel: -5,
+    opacity: 999
+  }), "utf8");
+
+  const store = new SettingsStore(tempFile);
+  const data = store.get();
+
+  // Size should have safely fallen back to default { width: 220, height: 220 }
+  assert.strictEqual(data.size.width, DEFAULTS.size.width);
+  assert.strictEqual(data.size.height, DEFAULTS.size.height);
+  assert.strictEqual(data.zoomLevel, DEFAULTS.zoomLevel);
+  assert.strictEqual(data.opacity, DEFAULTS.opacity);
+
+  // Patching with valid size clamps and preserves object structure
+  store.set({ size: { width: 350, height: 280 } });
+  assert.strictEqual(store.get("size").width, 350);
+  assert.strictEqual(store.get("size").height, 280);
+
+  if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
+});

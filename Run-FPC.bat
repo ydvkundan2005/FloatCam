@@ -1,20 +1,21 @@
 @echo off
-title Floating Phone Camera
+title FloatCam V3
 cd /d "%~dp0"
 echo ==================================================
-echo     Launching Floating Phone Camera (Windows)     
+echo              Launching FloatCam V3 (Windows)       
 echo ==================================================
 
-if exist "releases\FloatCam-v1.0-Windows.exe" (
-    start "" "releases\FloatCam-v1.0-Windows.exe"
+if exist "releases\FloatCam-Setup-v3.exe" (
+    echo Launching FloatCam V3 Setup Installer...
+    start "" "releases\FloatCam-Setup-v3.exe"
     exit
 )
 
-if exist "Floating Phone Camera.exe" (
-    start "" "Floating Phone Camera.exe"
+if exist "FloatCam.exe" (
+    start "" "FloatCam.exe"
     exit
 )
 
-echo Starting in development mode via npm...
+echo Starting FloatCam in development mode via npm...
 npm start
 exit

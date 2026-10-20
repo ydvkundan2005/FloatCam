@@ -8,10 +8,12 @@ dist-mac/
 out/
 build-artifacts/
 *.app
-*.dmg
-*.zip
-*.exe
-*.msi
+
+# Release binaries (uploaded to GitHub Releases, not committed to repo)
+releases/*.dmg
+releases/*.exe
+releases/*.zip
+releases/.DS_Store
 
 # SSL / TLS certificates & private keys (auto-generated locally on first launch)
 certs/*

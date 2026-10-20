@@ -25,7 +25,11 @@ test("IPC channels map defines all required event constants", () => {
     "SET_NETWORK_INTERFACE",
     "DISCONNECT_DEVICE",
     "TOGGLE_LOCAL_CAMERA",
-    "REGENERATE_CERTS"
+    "REGENERATE_CERTS",
+    "WINDOW_MINIMIZE",
+    "WINDOW_CLOSE",
+    "SHOW_DASHBOARD",
+    "SWITCH_CAMERA"
   ];
 
   for (const key of required) {

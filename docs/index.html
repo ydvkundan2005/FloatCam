@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FloatCam — Wireless Smartphone Webcam for Desktop</title>
+  <meta name="description" content="Turn your iPhone or Android into a wireless floating webcam. Zero latency WebRTC streaming over local Wi-Fi. No cloud, no accounts, just pure privacy. Free & open source." />
+  <meta name="keywords" content="FloatCam, phone webcam, wireless webcam, WebRTC, floating camera, macOS, Windows, Electron" />
+  <meta property="og:title" content="FloatCam — Wireless Smartphone Webcam" />
+  <meta property="og:description" content="Turn your phone into a floating desktop webcam. Sub-second latency, 100% private, zero cloud." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-0: #000000; --bg-1: #0a0a0b; --bg-2: #111113; --bg-3: #18181b;
+      --zinc-700: #3f3f46; --zinc-600: #52525b; --zinc-500: #71717a;
+      --zinc-400: #a1a1aa; --zinc-200: #e4e4e7; --white: #ffffff;
+      --red: #ef4444; --accent: #7c3aed; --accent-light: #a78bfa;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-0); color: var(--zinc-200); overflow-x: hidden; line-height: 1.6; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 64px; background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-text { font-size: 18px; font-weight: 700; color: var(--white); }
+    .nav-links { display: flex; align-items: center; gap: 8px; list-style: none; }
+    .nav-links a { color: var(--zinc-400); text-decoration: none; font-size: 14px; font-weight: 500; padding: 6px 14px; border-radius: 8px; transition: all 0.2s; }
+    .nav-links a:hover { color: var(--white); background: rgba(255,255,255,0.06); }
+    .nav-cta { background: var(--white) !important; color: var(--bg-0) !important; font-weight: 600 !important; }
+    .hero { position: relative; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; overflow: hidden; }
+    .hero-bg { position: absolute; top: -200px; left: 50%; transform: translateX(-50%); width: 800px; height: 800px; background: radial-gradient(ellipse, rgba(124,58,237,0.18) 0%, transparent 70%); pointer-events: none; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.35); border-radius: 100px; font-size: 12px; font-weight: 600; color: var(--accent-light); letter-spacing: 0.5px; margin-bottom: 28px; }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-light); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+    h1 { font-size: clamp(48px, 8vw, 96px); font-weight: 900; line-height: 1.0; letter-spacing: -3px; color: var(--white); margin-bottom: 8px; animation: fadeInUp 0.6s ease 0.1s both; }
+    .gradient-text { background: linear-gradient(135deg, #a78bfa 0%, #818cf8 40%, #67e8f9 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-sub { font-size: clamp(18px, 2.5vw, 22px); color: var(--zinc-400); max-width: 560px; margin: 20px auto 40px; animation: fadeInUp 0.6s ease 0.2s both; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; animation: fadeInUp 0.6s ease 0.3s both; }
+    .btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 600; text-decoration: none; transition: all 0.25s ease; border: none; cursor: pointer; }
+    .btn-mac { background: var(--white); color: var(--bg-0); }
+    .btn-mac:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(255,255,255,0.2); }
+    .btn-win { background: rgba(255,255,255,0.08); color: var(--white); border: 1px solid rgba(255,255,255,0.15); }
+    .btn-win:hover { transform: translateY(-2px); background: rgba(255,255,255,0.12); }
+    .btn-ghost { background: transparent; color: var(--zinc-400); border: 1px solid rgba(255,255,255,0.1); font-size: 14px; padding: 12px 22px; }
+    .btn-ghost:hover { color: var(--white); border-color: rgba(255,255,255,0.25); }
+    .hero-meta { margin-top: 28px; font-size: 13px; color: var(--zinc-500); animation: fadeInUp 0.6s ease 0.4s both; }
+    .rec-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--red); margin-right: 5px; animation: pulse 2s infinite; vertical-align: middle; }
+    .hero-screen { position: relative; margin-top: 70px; max-width: 900px; width: 100%; animation: fadeInUp 0.8s ease 0.5s both; }
+    .screen-wrap { border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 40px 120px rgba(0,0,0,0.8), 0 0 80px rgba(124,58,237,0.15); }
+    .screen-bar { height: 36px; background: rgba(15,15,17,0.95); border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; padding: 0 16px; gap: 7px; }
+    .td { width: 12px; height: 12px; border-radius: 50%; }
+    .td-r{background:#ff5f57} .td-y{background:#febc2e} .td-g{background:#28c840}
+    .stats { display: flex; flex-wrap: wrap; justify-content: center; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .stat { flex: 1; min-width: 160px; padding: 40px 24px; text-align: center; border-right: 1px solid rgba(255,255,255,0.05); }
+    .stat:last-child{border-right:none}
+    .stat-num { font-size: 40px; font-weight: 900; color: var(--white); letter-spacing: -2px; line-height: 1; margin-bottom: 6px; }
+    .stat-num span { background: linear-gradient(135deg, #a78bfa, #67e8f9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .stat-lbl { font-size: 13px; color: var(--zinc-500); font-weight: 500; }
+    section.inner { padding: 100px 24px; max-width: 1100px; margin: 0 auto; }
+    .section-tag { display: inline-block; font-size: 12px; font-weight: 700; color: var(--accent-light); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+    .section-title { font-size: clamp(32px, 5vw, 54px); font-weight: 800; letter-spacing: -1.5px; color: var(--white); line-height: 1.1; margin-bottom: 16px; }
+    .section-sub { font-size: 17px; color: var(--zinc-400); max-width: 500px; line-height: 1.7; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 60px; }
+    .feat-card { background: var(--bg-2); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 28px; transition: all 0.3s; position: relative; overflow: hidden; }
+    .feat-card:hover { border-color: rgba(124,58,237,0.3); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(124,58,237,0.1); }
+    .feat-icon { font-size: 28px; margin-bottom: 16px; display: block; }
+    .feat-title { font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+    .feat-desc { font-size: 14px; color: var(--zinc-500); line-height: 1.6; }
+    .how-wrap { padding: 100px 24px; background: var(--bg-1); }
+    .how-inner { max-width: 1100px; margin: 0 auto; }
+    .steps { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 60px; counter-reset: step; }
+    .step { padding: 28px 22px; background: var(--bg-2); border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); counter-increment: step; }
+    .step::before { content: counter(step, decimal-leading-zero); display: block; font-family: 'JetBrains Mono',monospace; font-size: 11px; font-weight: 600; color: var(--accent-light); letter-spacing: 1px; margin-bottom: 14px; }
+    .step-title { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+    .step-desc { font-size: 13px; color: var(--zinc-500); line-height: 1.6; }
+    .shapes-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 50px; justify-content: center; }
+    .shape-chip { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 18px 14px; background: var(--bg-2); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; min-width: 86px; transition: all 0.3s; }
+    .shape-chip:hover { border-color: rgba(167,139,250,0.4); background: rgba(124,58,237,0.08); transform: translateY(-4px); }
+    .shape-svg { width: 38px; height: 38px; }
+    .shape-name { font-size: 10px; font-weight: 600; color: var(--zinc-400); letter-spacing: 0.3px; text-align: center; }
+    .dl-section { padding: 100px 24px; text-align: center; }
+    .dl-cards { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 60px; }
+    .dl-card { flex: 1; min-width: 280px; max-width: 360px; background: var(--bg-2); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 36px 32px; text-align: left; position: relative; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; }
+    .dl-card:hover { transform: translateY(-6px); box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
+    .dl-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+    .dl-card-mac::after { background: linear-gradient(90deg, #a78bfa, #67e8f9); }
+    .dl-card-win::after { background: linear-gradient(90deg, #3b82f6, #06b6d4); }
+    .dl-os-icon { font-size: 36px; margin-bottom: 16px; display: block; }
+    .dl-os { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--zinc-500); margin-bottom: 8px; }
+    .dl-title { font-size: 22px; font-weight: 800; color: var(--white); letter-spacing: -0.5px; margin-bottom: 6px; }
+    .dl-ver { font-family: 'JetBrains Mono',monospace; font-size: 12px; color: var(--zinc-600); margin-bottom: 24px; }
+    .dl-specs { margin-bottom: 28px; }
+    .dl-spec { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--zinc-400); margin-bottom: 6px; }
+    .dl-spec::before { content: '✓'; color: var(--accent-light); font-weight: 700; }
+    .dl-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px; border-radius: 10px; font-size: 14px; font-weight: 700; text-decoration: none; transition: all 0.25s; border: none; cursor: pointer; }
+    .dl-btn-mac { background: var(--white); color: var(--bg-0); }
+    .dl-btn-mac:hover { box-shadow: 0 8px 30px rgba(255,255,255,0.15); }
+    .dl-btn-win { background: #0078d4; color: var(--white); }
+    .dl-btn-win:hover { background: #106ebe; box-shadow: 0 8px 30px rgba(0,120,212,0.35); }
+    .dl-size { text-align: center; margin-top: 12px; font-size: 12px; color: var(--zinc-600); }
+    .tech-strip { padding: 50px 24px; background: var(--bg-1); border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); text-align: center; }
+    .tech-label { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--zinc-600); margin-bottom: 24px; }
+    .tech-tags { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .tech-tag { padding: 8px 18px; background: var(--bg-2); border: 1px solid rgba(255,255,255,0.06); border-radius: 100px; font-size: 13px; font-weight: 500; color: var(--zinc-400); font-family: 'JetBrains Mono',monospace; transition: all 0.2s; }
+    .tech-tag:hover { border-color: rgba(124,58,237,0.4); color: var(--accent-light); }
+    .arch-box { margin-top: 50px; background: var(--bg-2); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 32px; font-family: 'JetBrains Mono',monospace; font-size: 13px; color: var(--zinc-400); line-height: 1.8; overflow-x: auto; }
+    .hl { color: var(--accent-light); }
+    footer { padding: 60px 24px; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; }
+    .ft-logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 24px; }
+    .ft-logo-text { font-size: 20px; font-weight: 700; color: var(--zinc-400); }
+    .ft-links { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 32px; list-style: none; }
+    .ft-links a { color: var(--zinc-500); text-decoration: none; font-size: 13px; padding: 4px 10px; border-radius: 6px; transition: color 0.2s; }
+    .ft-links a:hover { color: var(--white); }
+    .ft-bottom { font-size: 13px; color: var(--zinc-600); }
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (max-width: 768px) { nav { padding: 0 20px; } .nav-links { display: none; } }
+    ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg-0); } ::-webkit-scrollbar-thumb { background: var(--zinc-700); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo" id="nav-logo-link">
+    <svg width="32" height="32" viewBox="0 0 64 64" fill="none"><rect width="64" height="64" rx="14" fill="#0a0a0b"/><circle cx="32" cy="32" r="18" fill="none" stroke="#fff" stroke-width="2.5"/><circle cx="32" cy="32" r="11" fill="#141416" stroke="#52525b" stroke-width="1.5"/><circle cx="32" cy="32" r="5" fill="#000"/><circle cx="32" cy="32" r="1.8" fill="#fff"/><circle cx="44" cy="20" r="3.5" fill="#ef4444"/></svg>
+    <span class="nav-logo-text">FloatCam</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features" id="nav-features">Features</a></li>
+    <li><a href="#how-it-works" id="nav-how">How it Works</a></li>
+    <li><a href="#architecture" id="nav-arch">Docs</a></li>
+    <li><a href="#download" id="nav-dl" class="nav-cta">Download</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="badge"><span class="badge-dot"></span>Version 3.0 — Free &amp; Open Source</div>
+  <h1>Your Phone.<br><span class="gradient-text">Your Webcam.</span></h1>
+  <p class="hero-sub">Turn any iPhone or Android into a wireless floating desktop webcam. Sub-second WebRTC latency. 100% private — zero cloud, zero accounts.</p>
+  <div class="hero-actions">
+    <a href="https://github.com/ydvkundan2005/FloatCam/releases/download/v3.0/FloatCam-v3.dmg" class="btn btn-mac" id="hero-dl-mac">🍎 Download for Mac</a>
+    <a href="https://github.com/ydvkundan2005/FloatCam/releases/download/v3.0/FloatCam-Setup-v3.exe" class="btn btn-win" id="hero-dl-win">🪟 Download for Windows</a>
+    <a href="https://github.com/ydvkundan2005/FloatCam" class="btn btn-ghost" id="hero-github" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      View on GitHub
+    </a>
+  </div>
+  <p class="hero-meta"><span class="rec-dot"></span>macOS (Apple Silicon + Intel) &nbsp;·&nbsp; Windows x64 &nbsp;·&nbsp; MIT License &nbsp;·&nbsp; Electron + WebRTC</p>
+
+  <div class="hero-screen reveal">
+    <div class="screen-wrap">
+      <div class="screen-bar">
+        <div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div>
+      </div>
+      <svg viewBox="0 0 900 480" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;background:#0a0a0b;">
+        <rect width="900" height="480" fill="#0a0a0b"/>
+        <!-- Floating cam window -->
+        <circle cx="700" cy="200" r="130" fill="#000" stroke="#27272a" stroke-width="2"/>
+        <circle cx="700" cy="200" r="120" fill="#111113"/>
+        <circle cx="700" cy="200" r="80" fill="#0a0a0a" stroke="#3f3f46" stroke-width="1.5"/>
+        <circle cx="700" cy="200" r="40" fill="#050505"/>
+        <circle cx="700" cy="200" r="12" fill="#fff" opacity="0.85"/>
+        <!-- Glass reflection -->
+        <path d="M 630 155 A 100 100 0 0 1 740 130" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.2"/>
+        <!-- REC dot -->
+        <circle cx="793" cy="113" r="10" fill="#ef4444"/>
+        <circle cx="793" cy="113" r="4" fill="#fff" opacity="0.5"/>
+        <!-- Control panel -->
+        <rect x="30" y="60" width="340" height="390" rx="16" fill="#111113" stroke="#27272a" stroke-width="1"/>
+        <rect x="30" y="60" width="340" height="48" rx="16" fill="#18181b"/>
+        <rect x="30" y="92" width="340" height="16" fill="#18181b"/>
+        <text x="200" y="90" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="600" fill="#a1a1aa">FloatCam Control</text>
+        <circle cx="57" cy="84" r="4" fill="#22c55e"/>
+        <text x="70" y="88" font-family="Inter,sans-serif" font-size="10" fill="#71717a">Connected · 192.168.1.5</text>
+        <!-- QR area -->
+        <rect x="50" y="128" width="295" height="150" rx="10" fill="#0a0a0b" stroke="#27272a" stroke-width="1"/>
+        <text x="197" y="153" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#52525b">Scan to connect your phone</text>
+        <!-- QR mockup -->
+        <g transform="translate(142,163)">
+          <rect width="110" height="110" rx="6" fill="#fff"/>
+          <rect x="8" y="8" width="30" height="30" rx="3" fill="#000"/><rect x="11" y="11" width="24" height="24" rx="2" fill="#fff"/><rect x="15" y="15" width="16" height="16" rx="1" fill="#000"/>
+          <rect x="72" y="8" width="30" height="30" rx="3" fill="#000"/><rect x="75" y="11" width="24" height="24" rx="2" fill="#fff"/><rect x="79" y="15" width="16" height="16" rx="1" fill="#000"/>
+          <rect x="8" y="72" width="30" height="30" rx="3" fill="#000"/><rect x="11" y="75" width="24" height="24" rx="2" fill="#fff"/><rect x="15" y="79" width="16" height="16" rx="1" fill="#000"/>
+          <rect x="44" y="8" width="8" height="8" fill="#000"/><rect x="56" y="8" width="4" height="4" fill="#000"/>
+          <rect x="44" y="20" width="4" height="4" fill="#000"/><rect x="52" y="20" width="8" height="4" fill="#000"/>
+          <rect x="44" y="44" width="8" height="8" fill="#000"/><rect x="56" y="44" width="12" height="4" fill="#000"/>
+          <rect x="72" y="44" width="12" height="4" fill="#000"/><rect x="80" y="52" width="4" height="8" fill="#000"/>
+        </g>
+        <!-- Zoom slider -->
+        <text x="50" y="302" font-family="Inter,sans-serif" font-size="11" fill="#71717a">Zoom</text>
+        <text x="335" y="302" text-anchor="end" font-family="Inter,sans-serif" font-size="11" fill="#a1a1aa">1.8×</text>
+        <rect x="50" y="310" width="290" height="4" rx="2" fill="#27272a"/>
+        <rect x="50" y="310" width="140" height="4" rx="2" fill="#a78bfa"/>
+        <circle cx="190" cy="312" r="7" fill="#fff"/>
+        <!-- Opacity slider -->
+        <text x="50" y="342" font-family="Inter,sans-serif" font-size="11" fill="#71717a">Opacity</text>
+        <text x="335" y="342" text-anchor="end" font-family="Inter,sans-serif" font-size="11" fill="#a1a1aa">90%</text>
+        <rect x="50" y="350" width="290" height="4" rx="2" fill="#27272a"/>
+        <rect x="50" y="350" width="260" height="4" rx="2" fill="#67e8f9"/>
+        <circle cx="310" cy="352" r="7" fill="#fff"/>
+        <!-- Shape buttons -->
+        <text x="50" y="382" font-family="Inter,sans-serif" font-size="11" fill="#71717a">Window Shape</text>
+        <circle cx="72" cy="402" r="10" fill="#7c3aed"/>
+        <rect x="90" y="392" width="20" height="20" rx="4" fill="#27272a"/>
+        <rect x="118" y="392" width="20" height="20" rx="6" fill="#27272a"/>
+        <polygon points="148,402 155,392 162,402 155,412" fill="#27272a"/>
+        <rect x="172" y="392" width="20" height="20" rx="1" fill="#27272a"/>
+        <!-- Snap buttons -->
+        <text x="50" y="434" font-family="Inter,sans-serif" font-size="12" fill="#52525b">↖</text>
+        <text x="78" y="434" font-family="Inter,sans-serif" font-size="12" fill="#52525b">↗</text>
+        <text x="106" y="434" font-family="Inter,sans-serif" font-size="12" fill="#52525b">↙</text>
+        <text x="134" y="434" font-family="Inter,sans-serif" font-size="12" fill="#52525b">↘</text>
+        <!-- Wireless connection line -->
+        <line x1="410" y1="280" x2="580" y2="200" stroke="#7c3aed" stroke-width="1" stroke-dasharray="6 4" opacity="0.35"/>
+        <text x="460" y="265" font-family="Inter,sans-serif" font-size="10" fill="#52525b" opacity="0.8">WebRTC · Local Wi-Fi</text>
+        <!-- Phone silhouette -->
+        <rect x="410" y="240" width="18" height="80" rx="3" fill="#1a1a1a" stroke="#333" stroke-width="0.5" opacity="0.5"/>
+        <rect x="414" y="245" width="10" height="60" rx="1" fill="#0a0a0b" opacity="0.5"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat reveal"><div class="stat-num"><span>&lt;1s</span></div><div class="stat-lbl">WebRTC Latency</div></div>
+  <div class="stat reveal"><div class="stat-num"><span>10</span></div><div class="stat-lbl">Window Shapes</div></div>
+  <div class="stat reveal"><div class="stat-num"><span>0</span></div><div class="stat-lbl">Cloud Dependencies</div></div>
+  <div class="stat reveal"><div class="stat-num"><span>3×</span></div><div class="stat-lbl">Max Digital Zoom</div></div>
+</div>
+
+<!-- FEATURES -->
+<section class="inner" id="features">
+  <span class="section-tag reveal">Features</span>
+  <h2 class="section-title reveal">Everything you need.<br>Nothing you don't.</h2>
+  <p class="section-sub reveal">FloatCam is built for creators, developers, and anyone who needs a better webcam without compromise.</p>
+  <div class="features-grid">
+    <div class="feat-card reveal"><span class="feat-icon">📱</span><div class="feat-title">Wireless Phone Camera</div><p class="feat-desc">Stream from iPhone (Safari) or Android (Chrome) over local Wi-Fi. No USB, no cables, no apps to install on your phone.</p></div>
+    <div class="feat-card reveal"><span class="feat-icon">⚡</span><div class="feat-title">Sub-Second Latency</div><p class="feat-desc">Direct P2P WebRTC with hardware acceleration. Smooth, real-time preview without the lag of cloud-based solutions.</p></div>
+    <div class="feat-card reveal"><span class="feat-icon">🛡️</span><div class="feat-title">100% Private &amp; Local</div><p class="feat-desc">Zero cloud relays. Zero accounts. Zero telemetry. Every video packet stays on your local network — always.</p></div>
+    <div class="feat-card reveal"><span class="feat-icon">🎨</span><div class="feat-title">10 Geometric Shapes</div><p class="feat-desc">Circle, Squircle, Hexagon, Heart, Star, Diamond, Octagon, Rounded Rectangle, Square, and 16:9 Rectangle.</p></div>
+    <div class="feat-card reveal"><span class="feat-icon">🔍</span><div class="feat-title">Live Zoom &amp; Opacity</div><p class="feat-desc">Real-time digital zoom slider (1.0×–3.0×) and opacity control (10%–100%). Drag corners to resize instantly.</p></div>
+    <div class="feat-card reveal"><span class="feat-icon">📶</span><div class="feat-title">QR Code Connection</div><p class="feat-desc">No app needed. Point your phone's default camera at the QR code and you're connected in seconds.</p></div>
+    <div class="feat-card reveal"><span class="feat-icon">📍</span><div class="feat-title">Corner Snapping</div><p class="feat-desc">One-click snap to any corner — top-left, top-right, bottom-left, or bottom-right. Perfect for any layout.</p></div>
+    <div class="feat-card reveal"><span class="feat-icon">💻</span><div class="feat-title">Built-in Mac Webcam</div><p class="feat-desc">Toggle to your FaceTime or integrated camera anytime without closing FloatCam.</p></div>
+    <div class="feat-card reveal"><span class="feat-icon">🖥️</span><div class="feat-title">Menu Bar &amp; System Tray</div><p class="feat-desc">Runs as a lightweight background utility on macOS (LSUIElement) and Windows System Tray.</p></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div class="how-wrap" id="how-it-works">
+  <div class="how-inner">
+    <span class="section-tag reveal">How It Works</span>
+    <h2 class="section-title reveal">Up and running in 30 seconds.</h2>
+    <p class="section-sub reveal">No configuration. No accounts. No cloud. Just your phone and your Wi-Fi.</p>
+    <div class="steps">
+      <div class="step reveal"><div class="step-title">Download &amp; Launch</div><p class="step-desc">Install FloatCam on your Mac or PC. It appears as a tiny icon in your menu bar or system tray.</p></div>
+      <div class="step reveal"><div class="step-title">Same Wi-Fi Network</div><p class="step-desc">Make sure your phone and computer are on the same Wi-Fi. FloatCam handles everything automatically.</p></div>
+      <div class="step reveal"><div class="step-title">Scan QR Code</div><p class="step-desc">Open the FloatCam dashboard, then point your phone camera at the QR code. No app install required.</p></div>
+      <div class="step reveal"><div class="step-title">Tap "Start Camera"</div><p class="step-desc">Allow camera permissions on your phone. Video appears in the floating window instantly.</p></div>
+      <div class="step reveal"><div class="step-title">Customize &amp; Go</div><p class="step-desc">Pick your shape, set zoom, snap it to a corner. FloatCam stays always-on-top, ready for your calls.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- SHAPES -->
+<section class="inner" id="shapes">
+  <span class="section-tag reveal">Window Shapes</span>
+  <h2 class="section-title reveal">10 gorgeous shapes.</h2>
+  <p class="section-sub reveal">Make your floating camera window uniquely yours. Switch shapes with a single click.</p>
+  <div class="shapes-row reveal">
+    <div class="shape-chip"><svg class="shape-svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="#a78bfa" stroke-width="2"/></svg><span class="shape-name">Circle</span></div>
+    <div class="shape-chip"><svg class="shape-svg" viewBox="0 0 40 40"><rect x="4" y="4" width="32" height="32" rx="9" fill="none" stroke="#a78bfa" stroke-width="2"/></svg><span class="shape-name">Squircle</span></div>
+    <div class="shape-chip"><svg class="shape-svg" viewBox="0 0 40 40"><rect x="4" y="9" width="32" height="22" rx="5" fill="none" stroke="#a78bfa" stroke-width="2"/></svg><span class="shape-name">Rounded Rect</span></div>
+    <div class="shape-chip"><svg class="shape-svg" viewBox="0 0 40 40"><polygon points="20,3 35,11 35,29 20,37 5,29 5,11" fill="none" stroke="#a78bfa" stroke-width="2"/></svg><span class="shape-name">Hexagon</span></div>
+    <div class="shape-chip"><svg class="shape-svg" viewBox="0 0 40 40"><path d="M20 34 C20 34 3 24 3 14 C3 8 8 5 13 7 C16 8 18 11 20 13 C22 11 24 8 27 7 C32 5 37 8 37 14 C37 24 20 34 20 34Z" fill="none" stroke="#a78bfa" stroke-width="2"/></svg><span class="shape-name">Heart</span></div>
+    <div class="shape-chip"><svg class="shape-svg" viewBox="0 0 40 40"><polygon points="20,2 24,14 37,14 27,22 31,35 20,27 9,35 13,22 3,14 16,14" fill="none" stroke="#a78bfa" stroke-width="2"/></svg><span class="shape-name">Star</span></div>
+    <div class="shape-chip"><svg class="shape-svg" viewBox="0 0 40 40"><polygon points="20,2 38,20 20,38 2,20" fill="none" stroke="#a78bfa" stroke-width="2"/></svg><span class="shape-name">Diamond</span></div>
+    <div class="shape-chip"><svg class="shape-svg" viewBox="0 0 40 40"><polygon points="13,2 27,2 38,13 38,27 27,38 13,38 2,27 2,13" fill="none" stroke="#a78bfa" stroke-width="2"/></svg><span class="shape-name">Octagon</span></div>
+    <div class="shape-chip"><svg class="shape-svg" viewBox="0 0 40 40"><rect x="4" y="4" width="32" height="32" rx="2" fill="none" stroke="#a78bfa" stroke-width="2"/></svg><span class="shape-name">Square</span></div>
+    <div class="shape-chip"><svg class="shape-svg" viewBox="0 0 40 40"><rect x="2" y="9" width="36" height="22" rx="2" fill="none" stroke="#a78bfa" stroke-width="2"/></svg><span class="shape-name">16:9 Rect</span></div>
+  </div>
+</section>
+
+<!-- TECH STRIP -->
+<div class="tech-strip">
+  <div class="tech-label reveal">Built with</div>
+  <div class="tech-tags reveal">
+    <span class="tech-tag">Electron 32</span>
+    <span class="tech-tag">Node.js 18+</span>
+    <span class="tech-tag">WebRTC</span>
+    <span class="tech-tag">WebSockets</span>
+    <span class="tech-tag">HTTPS / TLS</span>
+    <span class="tech-tag">node-forge</span>
+    <span class="tech-tag">qrcode</span>
+    <span class="tech-tag">HTML5 Canvas</span>
+    <span class="tech-tag">MIT License</span>
+  </div>
+</div>
+
+<!-- ARCHITECTURE -->
+<section class="inner" id="architecture">
+  <span class="section-tag reveal">Architecture</span>
+  <h2 class="section-title reveal">Peer-to-peer.<br>No middleman.</h2>
+  <p class="section-sub reveal">Video never leaves your local network. The built-in signaling server runs entirely on your machine.</p>
+  <div class="arch-box reveal"><pre>
+  <span class="hl">[ Mobile Browser ]</span>  iOS Safari / Android Chrome
+           |
+           |  HTTPS + WSS + WebRTC  (Local Wi-Fi / LAN)
+           |
+  <span class="hl">[ Signaling Server ]</span>  Node.js HTTPS + WebSocket :9211
+           |
+  <span class="hl">[ Electron Main Process ]</span>  main.js / IPC Bus
+           |
+    +------+------+
+    |             |
+  <span class="hl">[ Preview Window ]</span>   <span class="hl">[ Control Dashboard ]</span>
+  Floating Camera     Menu Bar Popover</pre></div>
+</section>
+
+<!-- DOWNLOAD -->
+<section class="dl-section" id="download">
+  <span class="section-tag reveal">Download</span>
+  <h2 class="section-title reveal">Get FloatCam v3</h2>
+  <p class="section-sub reveal" style="margin:0 auto;">Free, open-source, ready to use. Pick your platform.</p>
+  <div class="dl-cards">
+    <div class="dl-card dl-card-mac reveal">
+      <span class="dl-os-icon">🍎</span>
+      <div class="dl-os">macOS</div>
+      <div class="dl-title">FloatCam for Mac</div>
+      <div class="dl-ver">FloatCam-v3.dmg · v3.0.0</div>
+      <div class="dl-specs">
+        <div class="dl-spec">Apple Silicon (M1 / M2 / M3 / M4)</div>
+        <div class="dl-spec">Intel Mac (x64)</div>
+        <div class="dl-spec">macOS 11 Big Sur or later</div>
+        <div class="dl-spec">Menu Bar integration (LSUIElement)</div>
+        <div class="dl-spec">Dark mode support</div>
+      </div>
+      <a href="https://github.com/ydvkundan2005/FloatCam/releases/download/v3.0/FloatCam-v3.dmg" class="dl-btn dl-btn-mac" id="dl-btn-mac">⬇ Download .dmg</a>
+      <div class="dl-size">~104 MB · Free · MIT License</div>
+    </div>
+    <div class="dl-card dl-card-win reveal">
+      <span class="dl-os-icon">🪟</span>
+      <div class="dl-os">Windows</div>
+      <div class="dl-title">FloatCam for Windows</div>
+      <div class="dl-ver">FloatCam-Setup-v3.exe · v3.0.0</div>
+      <div class="dl-specs">
+        <div class="dl-spec">Windows 10 / 11 (x64)</div>
+        <div class="dl-spec">One-click NSIS installer</div>
+        <div class="dl-spec">Desktop &amp; Start Menu shortcuts</div>
+        <div class="dl-spec">System Tray integration</div>
+        <div class="dl-spec">Clean uninstaller included</div>
+      </div>
+      <a href="https://github.com/ydvkundan2005/FloatCam/releases/download/v3.0/FloatCam-Setup-v3.exe" class="dl-btn dl-btn-win" id="dl-btn-win">⬇ Download .exe</a>
+      <div class="dl-size">~82 MB · Free · MIT License</div>
+    </div>
+  </div>
+  <div style="margin-top:48px;" class="reveal">
+    <p style="font-size:14px;color:#71717a;margin-bottom:16px;">Prefer to build from source?</p>
+    <div style="background:#111113;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px 28px;display:inline-block;text-align:left;max-width:500px;width:100%;">
+      <p style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#a1a1aa;line-height:2.2;">
+        <span style="color:#52525b">$</span> git clone https://github.com/ydvkundan2005/FloatCam<br>
+        <span style="color:#52525b">$</span> cd FloatCam &amp;&amp; npm install<br>
+        <span style="color:#52525b">$</span> npm start
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-logo">
+    <svg width="28" height="28" viewBox="0 0 64 64" fill="none"><rect width="64" height="64" rx="14" fill="#111113"/><circle cx="32" cy="32" r="18" fill="none" stroke="#52525b" stroke-width="2"/><circle cx="32" cy="32" r="10" fill="#0a0a0b" stroke="#3f3f46" stroke-width="1.5"/><circle cx="32" cy="32" r="4" fill="#fff" opacity="0.7"/><circle cx="44" cy="20" r="3" fill="#ef4444"/></svg>
+    <span class="ft-logo-text">FloatCam</span>
+  </div>
+  <ul class="ft-links">
+    <li><a href="https://github.com/ydvkundan2005/FloatCam" id="ft-github" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://github.com/ydvkundan2005/FloatCam/releases" id="ft-releases" target="_blank" rel="noopener">Releases</a></li>
+    <li><a href="https://github.com/ydvkundan2005/FloatCam/blob/main/docs/ARCHITECTURE.md" id="ft-arch" target="_blank" rel="noopener">Architecture</a></li>
+    <li><a href="https://github.com/ydvkundan2005/FloatCam/blob/main/docs/TROUBLESHOOTING.md" id="ft-trouble" target="_blank" rel="noopener">Troubleshooting</a></li>
+    <li><a href="https://github.com/ydvkundan2005/FloatCam/blob/main/LICENSE" id="ft-license" target="_blank" rel="noopener">MIT License</a></li>
+    <li><a href="https://github.com/ydvkundan2005/FloatCam/blob/main/CONTRIBUTING.md" id="ft-contrib" target="_blank" rel="noopener">Contributing</a></li>
+  </ul>
+  <p class="ft-bottom"><span class="rec-dot"></span>Made with love by <a href="https://github.com/ydvkundan2005" target="_blank" rel="noopener" style="color:#71717a;text-decoration:none;">ydvkundan2005</a> &nbsp;·&nbsp; MIT License &nbsp;·&nbsp; FloatCam v3.0.0</p>
+</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i * 60); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(el => io.observe(el));
+</script>
+</body>
+</html>

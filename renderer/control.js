@@ -1,12 +1,24 @@
 (function () {
-  // Elements - Header & Tabs
+  // Window & Traffic Light Controls
+  const closeBtn = document.getElementById('closeBtn');
+  const minBtn = document.getElementById('minBtn');
   const serverToggleBtn = document.getElementById('serverToggleBtn');
   const serverToggleText = document.getElementById('serverToggleText');
   const quitBtn = document.getElementById('quitBtn');
+  const quickQuitBtn = document.getElementById('quickQuitBtn');
+  const footerIpText = document.getElementById('footerIpText');
+
+  // Menu Bar Mirror Dock Controls
+  const quickVisibleToggle = document.getElementById('quickVisibleToggle');
+  const quickPinToggle = document.getElementById('quickPinToggle');
+  const quickLocalCamToggle = document.getElementById('quickLocalCamToggle');
+  const quickResetBtn = document.getElementById('quickResetBtn');
+
+  // Tab Navigation
   const tabBtns = document.querySelectorAll('.tab-btn');
   const tabContents = document.querySelectorAll('.tab-content');
 
-  // Elements - Connect Tab
+  // Elements - Tab 1: Connect
   const statusDot = document.getElementById('statusDot');
   const statusLabel = document.getElementById('statusLabel');
   const statusHint = document.getElementById('statusHint');
@@ -19,7 +31,7 @@
   const macCamToggle = document.getElementById('macCamToggle');
   const remoteSwitchBtn = document.getElementById('remoteSwitchBtn');
 
-  // Elements - Controls Tab
+  // Elements - Tab 2: Controls & Shapes
   const visibleToggle = document.getElementById('visibleToggle');
   const alwaysOnTopToggle = document.getElementById('alwaysOnTopToggle');
   const shapeGrid = document.getElementById('shapeGrid');
@@ -33,7 +45,7 @@
   const opacityValueEl = document.getElementById('opacityValue');
   const resetBtn = document.getElementById('resetBtn');
 
-  // Elements - Troubleshoot Tab
+  // Elements - Tab 3: Troubleshoot
   const downloadCaBtn = document.getElementById('downloadCaBtn');
   const regenCertsBtn = document.getElementById('regenCertsBtn');
 
@@ -41,6 +53,18 @@
   let currentPhoneUrl = '';
   let sizeRafPending = false;
   let isServerRunning = true;
+
+  // ---- Window Traffic Light Actions ----
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      if (window.controls.closeWindow) window.controls.closeWindow();
+    });
+  }
+  if (minBtn) {
+    minBtn.addEventListener('click', () => {
+      if (window.controls.minimizeWindow) window.controls.minimizeWindow();
+    });
+  }
 
   // ---- Tabs ----
   tabBtns.forEach((btn) => {
@@ -97,13 +121,19 @@
     });
   }
 
-  // ---- Reflect Settings ----
+  // ---- Reflect Settings to UI ----
   function applySettings(settings) {
     if (!settings) return;
     currentSettings = settings;
 
-    visibleToggle.checked = !!settings.visible;
-    alwaysOnTopToggle.checked = !!settings.alwaysOnTop;
+    // Visibility toggles
+    if (visibleToggle) visibleToggle.checked = !!settings.visible;
+    if (quickVisibleToggle) quickVisibleToggle.checked = !!settings.visible;
+
+    // Always on top toggles
+    if (alwaysOnTopToggle) alwaysOnTopToggle.checked = !!settings.alwaysOnTop;
+    if (quickPinToggle) quickPinToggle.checked = !!settings.alwaysOnTop;
+
     highlightActiveShape(settings.shape);
 
     const zoom = Number(settings.zoomLevel) || 1;
@@ -126,39 +156,41 @@
 
     if (isServerRunning) {
       serverToggleBtn.className = 'pill-btn on';
-      serverToggleText.textContent = 'Server Running';
+      serverToggleText.textContent = 'Server Live';
     } else {
       serverToggleBtn.className = 'pill-btn off';
       serverToggleText.textContent = 'Server Stopped';
     }
 
-    macCamToggle.checked = !!status.usingLocalCamera;
-    remoteSwitchBtn.disabled = !status.phoneConnected;
+    if (macCamToggle) macCamToggle.checked = !!status.usingLocalCamera;
+    if (quickLocalCamToggle) quickLocalCamToggle.checked = !!status.usingLocalCamera;
+    if (remoteSwitchBtn) remoteSwitchBtn.disabled = !status.phoneConnected;
 
     if (!status.serverRunning) {
       statusDot.className = 'status-dot error';
-      statusLabel.textContent = 'Server is stopped';
+      statusLabel.textContent = 'Server Stopped';
       if (status.serverError === 'port-in-use') {
-        statusHint.textContent = 'Port 9211 is already in use by another app.';
+        const portRef = status.port ? ` (port ${status.port})` : '';
+        statusHint.textContent = `A port${portRef} is already in use by another app. FloatCam will try a different port on next start.`;
       } else {
-        statusHint.textContent = 'Click "Server Stopped" above to turn the server on.';
+        statusHint.textContent = 'Click "Server Stopped" above to turn signaling server on.';
       }
     } else if (status.usingLocalCamera) {
       statusDot.className = 'status-dot ok';
-      statusLabel.textContent = 'Mac Webcam Live';
-      statusHint.textContent = 'Rendering directly from your Mac FaceTime / integrated camera.';
+      statusLabel.textContent = 'Local Webcam Active';
+      statusHint.textContent = 'Streaming directly from your integrated / USB camera.';
     } else if (!status.phoneConnected) {
       statusDot.className = 'status-dot warn';
-      statusLabel.textContent = 'Waiting for phone';
-      statusHint.textContent = 'Scan the QR code below or open the URL in your phone browser.';
+      statusLabel.textContent = 'Waiting for Phone';
+      statusHint.textContent = 'Scan the QR code below on your phone to connect.';
     } else if (!status.videoPlaying) {
       statusDot.className = 'status-dot warn';
-      statusLabel.textContent = 'Phone connected';
-      statusHint.textContent = 'Tap "Start Camera" on your phone to begin live streaming.';
+      statusLabel.textContent = 'Phone Connected';
+      statusHint.textContent = 'Tap "Start Camera" on your phone to begin live stream.';
     } else {
       statusDot.className = 'status-dot ok';
-      statusLabel.textContent = 'Camera stream active';
-      statusHint.textContent = 'Streaming live video directly over local Wi-Fi.';
+      statusLabel.textContent = 'Camera Stream Active';
+      statusHint.textContent = 'Live video streaming smoothly over local Wi-Fi.';
     }
 
     // Render Connected Devices list
@@ -190,6 +222,9 @@
       phoneUrlEl.textContent = info.phoneUrl;
       if (info.qrDataUrl) {
         qrImage.src = info.qrDataUrl;
+      }
+      if (footerIpText && info.ip) {
+        footerIpText.textContent = `https://${info.ip}:${info.port || 9211} • Local Peer-to-Peer`;
       }
     } catch (err) {
       phoneUrlEl.textContent = 'Unavailable';
@@ -245,24 +280,67 @@
     await refreshSignalInfo();
   });
 
-  // ---- Mac Webcam & Remote Phone Camera Flip ----
-  macCamToggle.addEventListener('change', async () => {
-    await window.controls.toggleLocalCamera(macCamToggle.checked);
-  });
+  // ---- Webcam & Remote Phone Camera Flip ----
+  const handleCamToggle = async (checked) => {
+    if (macCamToggle) macCamToggle.checked = checked;
+    if (quickLocalCamToggle) quickLocalCamToggle.checked = checked;
+    await window.controls.toggleLocalCamera(checked);
+  };
 
-  remoteSwitchBtn.addEventListener('click', async () => {
-    // Sends remote switch to phone
-    window.controls.copyToClipboard('camera-switch');
-  });
+  if (macCamToggle) {
+    macCamToggle.addEventListener('change', () => handleCamToggle(macCamToggle.checked));
+  }
+  if (quickLocalCamToggle) {
+    quickLocalCamToggle.addEventListener('change', () => handleCamToggle(quickLocalCamToggle.checked));
+  }
 
-  // ---- Controls Tab Event Handlers ----
-  visibleToggle.addEventListener('change', async () => {
-    applySettings(await window.controls.setVisible(visibleToggle.checked));
-  });
+  let switchCamPending = false;
+  if (remoteSwitchBtn) {
+    remoteSwitchBtn.addEventListener('click', async () => {
+      if (switchCamPending) return;
+      switchCamPending = true;
+      const prev = remoteSwitchBtn.textContent;
+      remoteSwitchBtn.disabled = true;
+      try {
+        await window.controls.switchCamera();
+        remoteSwitchBtn.textContent = 'Flipped!';
+      } catch (_) {
+        remoteSwitchBtn.textContent = 'Failed';
+      }
+      setTimeout(() => {
+        remoteSwitchBtn.textContent = prev;
+        remoteSwitchBtn.disabled = false;
+        switchCamPending = false;
+      }, 1500);
+    });
+  }
 
-  alwaysOnTopToggle.addEventListener('change', async () => {
-    applySettings(await window.controls.setAlwaysOnTop(alwaysOnTopToggle.checked));
-  });
+  // ---- Floating Camera Controls ----
+  const handleVisibleToggle = async (checked) => {
+    if (visibleToggle) visibleToggle.checked = checked;
+    if (quickVisibleToggle) quickVisibleToggle.checked = checked;
+    applySettings(await window.controls.setVisible(checked));
+  };
+
+  if (visibleToggle) {
+    visibleToggle.addEventListener('change', () => handleVisibleToggle(visibleToggle.checked));
+  }
+  if (quickVisibleToggle) {
+    quickVisibleToggle.addEventListener('change', () => handleVisibleToggle(quickVisibleToggle.checked));
+  }
+
+  const handlePinToggle = async (checked) => {
+    if (alwaysOnTopToggle) alwaysOnTopToggle.checked = checked;
+    if (quickPinToggle) quickPinToggle.checked = checked;
+    applySettings(await window.controls.setAlwaysOnTop(checked));
+  };
+
+  if (alwaysOnTopToggle) {
+    alwaysOnTopToggle.addEventListener('change', () => handlePinToggle(alwaysOnTopToggle.checked));
+  }
+  if (quickPinToggle) {
+    quickPinToggle.addEventListener('change', () => handlePinToggle(quickPinToggle.checked));
+  }
 
   zoomSlider.addEventListener('input', async () => {
     const value = Number(zoomSlider.value);
@@ -304,18 +382,25 @@
     });
   });
 
-  resetBtn.addEventListener('click', async () => {
+  const handleReset = async () => {
     applySettings(await window.controls.resetSettings());
-  });
+  };
 
-  quitBtn.addEventListener('click', () => {
+  if (resetBtn) resetBtn.addEventListener('click', handleReset);
+  if (quickResetBtn) quickResetBtn.addEventListener('click', handleReset);
+
+  const handleQuit = () => {
     window.controls.quitApp();
-  });
+  };
+
+  if (quitBtn) quitBtn.addEventListener('click', handleQuit);
+  if (quickQuitBtn) quickQuitBtn.addEventListener('click', handleQuit);
 
   // ---- Troubleshoot Actions ----
   downloadCaBtn.addEventListener('click', () => {
     if (currentPhoneUrl && window.controls.openExternal) {
-      window.controls.openExternal(`${currentPhoneUrl}ca.crt`);
+      const baseUrl = currentPhoneUrl.split('?')[0].replace(/\/+$/, '');
+      window.controls.openExternal(`${baseUrl}/ca.crt`);
     }
   });
 
@@ -352,7 +437,16 @@
     } catch (e) {}
 
     window.controls.onState((state) => applySettings(state));
-    window.controls.onConnectionStatus((status) => updateStatus(status));
+
+    let _lastServerRunning = isServerRunning;
+    window.controls.onConnectionStatus(async (status) => {
+      updateStatus(status);
+      // Auto-refresh QR code whenever the server transitions to running
+      if (status.serverRunning && !_lastServerRunning) {
+        await refreshSignalInfo();
+      }
+      _lastServerRunning = !!status.serverRunning;
+    });
   }
 
   init();

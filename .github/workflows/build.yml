@@ -53,8 +53,8 @@ jobs:
       - name: Upload macOS DMG Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FloatCam-macOS-DMG
-          path: dist/FloatCam-macOS.dmg
+          name: FloatCam-v3-macOS-DMG
+          path: dist/FloatCam-v3.dmg
           if-no-files-found: error
 
   build-windows:
@@ -77,9 +77,23 @@ jobs:
       - name: Build Windows Distribution
         run: npm run build:win
 
+      - name: Upload Windows Setup Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: FloatCam-Setup-v3
+          path: dist/installer/FloatCam-Setup-v3.exe
+          if-no-files-found: error
+
+      - name: Upload Windows Portable Executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: FloatCam-v3-Portable
+          path: dist/installer/FloatCam-v3-Portable.exe
+          if-no-files-found: warn
+
       - name: Upload Windows ZIP Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FloatCam-Windows-x64
-          path: dist/FloatCam-Windows-x64.zip
+          name: FloatCam-v3-Windows-x64-ZIP
+          path: dist/FloatCam-v3-Windows-x64.zip
           if-no-files-found: error

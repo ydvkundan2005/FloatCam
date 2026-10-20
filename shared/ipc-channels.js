@@ -24,5 +24,9 @@ module.exports = {
   SET_NETWORK_INTERFACE: 'floatingcam:set-network-interface',
   DISCONNECT_DEVICE: 'floatingcam:disconnect-device',
   TOGGLE_LOCAL_CAMERA: 'floatingcam:toggle-local-camera',
-  REGENERATE_CERTS: 'floatingcam:regenerate-certs'
+  REGENERATE_CERTS: 'floatingcam:regenerate-certs',
+  WINDOW_MINIMIZE: 'floatingcam:window-minimize',
+  WINDOW_CLOSE: 'floatingcam:window-close',
+  SHOW_DASHBOARD: 'floatingcam:show-dashboard',
+  SWITCH_CAMERA: 'floatingcam:switch-camera'
 };

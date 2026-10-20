@@ -1,44 +1,51 @@
-# FloatCam Packaging & Release Guide
+# FloatCam V3 — Packaging & Release Guide
 
-## macOS Packaging
+FloatCam provides production packaging pipelines for macOS and Windows.
 
-FloatCam includes an automated build script for macOS that generates a ready-to-distribute `.dmg` installer:
+---
+
+## 🍎 macOS Packaging
+
+Generates a standalone, compressed disk image (`.dmg`) with `/Applications` drag-and-drop installer:
 
 ```bash
 npm run build:mac
 ```
 
-### What the macOS build process does:
-1. Runs `@electron/packager` targeting platform `darwin` for the current architecture (`arm64` Apple Silicon or `x64` Intel).
-2. Injects `LSUIElement=true` into `Contents/Info.plist` so the app functions seamlessly as a resident menu-bar utility without cluttering the macOS Dock.
-3. Sets bundle metadata: `com.floatcam.desktop` in category `public.app-category.utilities`.
-4. Applies ad-hoc codesigning (`codesign -s -`).
-5. Stages a clean disk image layout containing `Floating Phone Camera.app` and a shortcut to `/Applications`.
-6. Uses `hdiutil` to produce an optimized, compressed UDZO `FloatCam-macOS.dmg` inside `dist/`.
+### macOS Pipeline Workflow:
+1. Invokes `@electron/packager` for `darwin` (`arm64` Apple Silicon or `x64` Intel) with ASAR enabled.
+2. Injects Camera, Microphone, and ATS local networking entitlements into `Info.plist`.
+3. Injects high-resolution ICNS icon resources.
+4. Applies ad-hoc code signature (`codesign --force --deep -s -`).
+5. Stages disk image structure with symlink to `/Applications`.
+6. Creates optimized UDZO compressed disk image:
+   - Output: `releases/FloatCam-v3.dmg` (and `dist/FloatCam-v3.dmg`)
 
 ---
 
-## Windows Packaging
+## 🪟 Windows Packaging
 
-FloatCam can be packaged for 64-bit Windows environments:
+Generates a single-file NSIS setup installer and standalone portable archive:
 
 ```bash
 npm run build:win
 ```
 
-### What the Windows build process does:
-1. Verifies that the multi-size Windows icon (`assets/Floating-Phone-Camera.ico`) is present.
-2. Invokes `@electron/packager` for platform `win32` and architecture `x64`.
-3. Injects a convenient `Run-FPC.bat` launcher script into the application directory.
-4. Compresses the application bundle into `dist/FloatCam-Windows-x64.zip`.
-
-### Windows System Tray Behavior
-On Windows, the application docks into the bottom-right Notification Area (System Tray). Clicking the tray icon calculates the taskbar position and opens the control dashboard popup directly above the system tray.
+### Windows Pipeline Workflow:
+1. **NSIS Setup Installer (`FloatCam-Setup-v3.exe`)**:
+   - Built via `electron-builder --win nsis --x64`.
+   - Embeds all runtime DLLs (`ffmpeg.dll`, `d3dcompiler_47.dll`, `vulkan-1.dll`, `libEGL.dll`, `libGLESv2.dll`) and `app.asar`.
+   - Creates Desktop & Start Menu shortcuts.
+   - Output: `releases/FloatCam-Setup-v3.exe`.
+2. **Portable ZIP Distribution (`FloatCam-v3-Windows-x64.zip`)**:
+   - Bundles all binaries together with `Run-FloatCam.bat` and `HOW-TO-RUN.txt`.
+   - Output: `releases/FloatCam-v3-Windows-x64.zip`.
 
 ---
 
-## Release Artifacts
+## 📦 Production Release Artifacts
 
-All compiled outputs are saved to the `dist/` folder:
-- `dist/FloatCam-macOS.dmg`: macOS installer
-- `dist/FloatCam-Windows-x64.zip`: Windows standalone distribution
+All final releases are located in [`releases/`](../releases/):
+- `releases/FloatCam-Setup-v3.exe` (79 MB)
+- `releases/FloatCam-v3.dmg` (100 MB)
+- `releases/FloatCam-v3-Windows-x64.zip` (112 MB)

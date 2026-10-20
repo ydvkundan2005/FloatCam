@@ -33,5 +33,8 @@ contextBridge.exposeInMainWorld('floatingCam', {
   reportVideoState: (isPlaying) => ipcRenderer.send(CH.VIDEO_STATE, !!isPlaying),
 
   /** Incremental drag-to-resize from the on-screen resize handle (screen-pixel deltas). */
-  resizeBy: (dw, dh) => ipcRenderer.send(CH.RESIZE_DELTA, { dw, dh })
+  resizeBy: (dw, dh) => ipcRenderer.send(CH.RESIZE_DELTA, { dw, dh }),
+
+  /** Open / focus the App Dashboard */
+  showDashboard: () => ipcRenderer.send(CH.SHOW_DASHBOARD)
 });

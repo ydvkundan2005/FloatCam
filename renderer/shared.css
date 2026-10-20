@@ -6,19 +6,18 @@ body {
   background: transparent;
   width: 100%;
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
 }
 
-/* The shape container is the thing the clip-path / border-radius is applied
-   to. It fills the whole (transparent) BrowserWindow, so visually the
-   window appears to *be* whatever shape is selected. */
+/* The shape container fills the transparent BrowserWindow so visually the window appears to be the selected shape */
 .shape-container {
   position: relative;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: #0b0b0c;
+  background: #000000;
   -webkit-app-region: drag;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 video {
@@ -31,7 +30,7 @@ video {
   transform-origin: center center;
   transition: transform 0.12s ease-out;
   pointer-events: none;
-  background: #0b0b0c;
+  background: #000000;
 }
 
 .overlay {
@@ -41,14 +40,16 @@ video {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(18, 18, 20, 0.6);
+  gap: 10px;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;
   text-align: center;
-  padding: 12px;
+  padding: 16px;
   box-sizing: border-box;
 }
 
@@ -57,27 +58,40 @@ video {
 }
 
 .overlay-dot {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: #ff9f0a;
-  box-shadow: 0 0 8px rgba(255, 159, 10, 0.85);
+  background: #ef4444;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.95), 0 0 4px #ffffff;
+  animation: pulse-red 2s infinite ease-in-out;
+}
+
+@keyframes pulse-red {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 0.7;
+  }
 }
 
 .overlay-text {
   font-size: 12px;
   font-weight: 500;
-  letter-spacing: 0.2px;
-  max-width: 92%;
+  letter-spacing: 0.3px;
+  max-width: 90%;
   line-height: 1.4;
+  color: #a1a1aa;
 }
 
 .resize-handle {
   position: absolute;
   right: 1px;
   bottom: 1px;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   -webkit-app-region: no-drag;
   cursor: nwse-resize;
   opacity: 0;
@@ -86,7 +100,7 @@ video {
 }
 
 .shape-container:hover .resize-handle {
-  opacity: 0.6;
+  opacity: 0.8;
 }
 
 .resize-handle::before {
@@ -94,8 +108,8 @@ video {
   position: absolute;
   right: 4px;
   bottom: 4px;
-  width: 9px;
-  height: 9px;
-  border-right: 2px solid rgba(255, 255, 255, 0.95);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.95);
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
 }
