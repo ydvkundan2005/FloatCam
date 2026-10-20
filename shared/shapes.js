@@ -13,8 +13,8 @@
     {
       id: 'circle',
       label: 'Circle',
-      clipPath: 'circle(50% at 50% 50%)',
-      borderRadius: '0',
+      clipPath: 'none',
+      borderRadius: '50%',
       aspectRatio: 1,
       lockAspect: true
     },

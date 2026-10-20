@@ -9,7 +9,6 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
 }
 
-/* The shape container fills the transparent BrowserWindow so visually the window appears to be the selected shape */
 .shape-container {
   position: relative;
   width: 100vw;
@@ -17,7 +16,9 @@ body {
   overflow: hidden;
   background: #000000;
   -webkit-app-region: drag;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+  filter: none;
+  outline: none;
 }
 
 video {

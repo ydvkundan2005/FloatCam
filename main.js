@@ -11,13 +11,31 @@
  *  - certificate-error handler covers the dynamic port
  */
 
-'use strict';
+// Catch uncaught exceptions gracefully to prevent unexpected dialogs
+process.on('uncaughtException', (err) => {
+  console.error('[FloatCam:uncaughtException]', err);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[FloatCam:unhandledRejection]', reason);
+});
 
-const { app, Tray, Menu, BrowserWindow, ipcMain, screen, dialog, nativeImage } = require('electron');
+const { app, Tray, Menu, BrowserWindow, ipcMain, dialog, nativeImage } = require('electron');
 const path   = require('path');
 const fs     = require('fs');
 const crypto = require('crypto');
 const QRCode = require('qrcode');
+
+// Single-instance lock: prevent multiple instances running simultaneously
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (app.isReady()) {
+      showAppDashboard();
+    }
+  });
+}
 
 // Trust our own self-signed local-CA for WSS/HTTPS connections
 app.commandLine.appendSwitch('allow-insecure-localhost', 'true');
@@ -84,7 +102,7 @@ const connectionStatus = {
 // ---------------------------------------------------------------------------
 
 function computeCornerPosition(corner, size, display) {
-  const area = display.workArea;
+  const area = (display && display.workArea) ? display.workArea : { x: 0, y: 0, width: 1280, height: 800 };
   switch (corner) {
     case 'top-left':
       return { x: area.x + CORNER_MARGIN, y: area.y + CORNER_MARGIN };
@@ -119,9 +137,11 @@ function clampSize(width, height, shapeDef) {
 // ---------------------------------------------------------------------------
 
 function createPreviewWindow() {
+  if (!app.isReady()) return;
   const settings = settingsStore.get();
   const shapeDef = getShape(settings.shape);
-  const display  = screen.getPrimaryDisplay();
+  const { screen } = require('electron');
+  const display  = screen ? screen.getPrimaryDisplay() : null;
   const pos      = settings.position
     || computeCornerPosition(settings.quickPosition || 'bottom-right', settings.size, display);
 
@@ -182,13 +202,16 @@ function createPreviewWindow() {
 // ---------------------------------------------------------------------------
 
 function createControlWindow() {
+  if (!app.isReady()) return;
   const isMac = process.platform === 'darwin';
   const isWin = process.platform === 'win32';
-  const display = screen.getPrimaryDisplay();
+  const { screen } = require('electron');
+  const display = screen ? screen.getPrimaryDisplay() : null;
+  const workArea = (display && display.workArea) ? display.workArea : { x: 0, y: 0, width: 1280, height: 800 };
   const width  = 450;
   const height = 750;
-  const x = Math.round(display.workArea.x + (display.workArea.width  - width)  / 2);
-  const y = Math.round(display.workArea.y + Math.max(20, (display.workArea.height - height) / 2));
+  const x = Math.round(workArea.x + (workArea.width  - width)  / 2);
+  const y = Math.round(workArea.y + Math.max(20, (workArea.height - height) / 2));
 
   // Windows 11 supports 'acrylic'; Windows 10 silently ignores it → use 'none' fallback
   let backgroundMaterial;
@@ -232,13 +255,16 @@ function createControlWindow() {
 }
 
 function showAppDashboard() {
+  if (!app.isReady()) return;
   if (!controlWindow || controlWindow.isDestroyed()) createControlWindow();
+  if (!controlWindow || controlWindow.isDestroyed()) return;
   if (controlWindow.isMinimized()) controlWindow.restore();
   controlWindow.show();
   controlWindow.focus();
 }
 
 function toggleControlWindow() {
+  if (!app.isReady()) return;
   if (!controlWindow || controlWindow.isDestroyed()) {
     createControlWindow();
     showAppDashboard();
@@ -394,7 +420,8 @@ function setSize(size) {
 
 function quickPosition(corner) {
   if (!previewWindow || previewWindow.isDestroyed()) return settingsStore.get();
-  const display = screen.getDisplayNearestPoint(previewWindow.getBounds());
+  const { screen } = require('electron');
+  const display = screen ? screen.getDisplayNearestPoint(previewWindow.getBounds()) : null;
   const size    = settingsStore.get('size');
   const pos     = computeCornerPosition(corner, size, display);
   previewWindow.setPosition(pos.x, pos.y, true);
@@ -407,7 +434,8 @@ function resetSettings() {
   const settings = settingsStore.reset();
   if (previewWindow && !previewWindow.isDestroyed()) {
     const shapeDef = getShape(settings.shape);
-    const display  = screen.getDisplayNearestPoint(previewWindow.getBounds());
+    const { screen } = require('electron');
+    const display  = screen ? screen.getDisplayNearestPoint(previewWindow.getBounds()) : null;
     const pos      = computeCornerPosition('bottom-right', settings.size, display);
     previewWindow.setSize(settings.size.width, settings.size.height, false);
     previewWindow.setPosition(pos.x, pos.y, false);
@@ -706,6 +734,7 @@ app.on('certificate-error', (event, _webContents, url, _error, _certificate, cal
 // ---------------------------------------------------------------------------
 
 app.whenReady().then(async () => {
+  if (!gotTheLock) return;
   if (process.platform === 'darwin' && app.dock) app.dock.show();
 
   settingsStore = new SettingsStore(path.join(app.getPath('userData'), 'settings.json'));
@@ -718,7 +747,11 @@ app.whenReady().then(async () => {
   showAppDashboard();
 });
 
-app.on('activate', () => showAppDashboard());
+app.on('activate', () => {
+  if (app.isReady()) {
+    showAppDashboard();
+  }
+});
 
 // Keep app alive even when all windows are closed (lives in tray/menu-bar)
 app.on('window-all-closed', () => {});
