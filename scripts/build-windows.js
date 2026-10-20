@@ -112,7 +112,21 @@ if (!makensis) {
 }
 
 console.log(`Using makensis: ${makensis}`);
-execSync(`"${makensis}" "${NSI_SCRIPT}"`, {
+
+// Convert paths to platform-native format for NSIS (always backslashes on Windows)
+const nsiRoot = ROOT_DIR.replace(/\//g, '\\');
+const nsiAppDir = WIN_APP_DIR.replace(/\//g, '\\');
+const nsiOutDir = DIST_INSTALLER.replace(/\//g, '\\');
+const nsiIcon = ICO_PATH.replace(/\//g, '\\');
+
+const nsisDefines = [
+  `-DROOT_DIR="${nsiRoot}"`,
+  `-DAPP_DIR="${nsiAppDir}"`,
+  `-DOUT_DIR="${nsiOutDir}"`,
+  `-DICON_PATH="${nsiIcon}"`
+].join(' ');
+
+execSync(`"${makensis}" ${nsisDefines} "${NSI_SCRIPT}"`, {
   stdio: "inherit",
   cwd: ROOT_DIR
 });

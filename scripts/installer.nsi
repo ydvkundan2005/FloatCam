@@ -3,10 +3,25 @@ Unicode true
 !define PRODUCT_NAME "FloatCam"
 !define PRODUCT_VERSION "3.0.0"
 !define PRODUCT_PUBLISHER "FloatCam Contributors"
-!define PRODUCT_WEB_SITE "https://github.com/username/FloatCam"
+!define PRODUCT_WEB_SITE "https://github.com/ydvkundan2005/FloatCam"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\FloatCam.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKCU"
+
+; Paths passed in as defines from build script (-DROOT_DIR=... -DAPP_DIR=... -DOUT_DIR=... -DICON_PATH=...)
+; Fallback to relative paths for manual builds
+!ifndef ROOT_DIR
+  !define ROOT_DIR ".."
+!endif
+!ifndef APP_DIR
+  !define APP_DIR "${ROOT_DIR}\dist\win\FloatCam-win32-x64"
+!endif
+!ifndef OUT_DIR
+  !define OUT_DIR "${ROOT_DIR}\dist\installer"
+!endif
+!ifndef ICON_PATH
+  !define ICON_PATH "${ROOT_DIR}\assets\icon.ico"
+!endif
 
 SetCompressor /SOLID lzma
 
@@ -15,8 +30,8 @@ SetCompressor /SOLID lzma
 
 ; MUI Settings
 !define MUI_ABORTWARNING
-!define MUI_ICON "../assets/icon.ico"
-!define MUI_UNICON "../assets/icon.ico"
+!define MUI_ICON "${ICON_PATH}"
+!define MUI_UNICON "${ICON_PATH}"
 
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
@@ -38,7 +53,7 @@ SetCompressor /SOLID lzma
 
 ; Name and Output File
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "../dist/installer/FloatCam-Setup-v3.exe"
+OutFile "${OUT_DIR}\FloatCam-Setup-v3.exe"
 InstallDir "$LOCALAPPDATA\Programs\FloatCam"
 InstallDirRegKey HKCU "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
@@ -53,7 +68,7 @@ Section "MainSection" SEC01
   SetOverwrite try
 
   ; Copy all files from the verified working application build
-  File /r "../dist/win/FloatCam-win32-x64/*"
+  File /r "${APP_DIR}\*"
 
   ; Create Shortcuts
   CreateDirectory "$SMPROGRAMS\FloatCam"
