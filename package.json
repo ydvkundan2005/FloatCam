@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "start": "electron .",
-    "test": "node --test tests/*.test.js",
+    "test": "node --test",
     "cert": "node scripts/generate-certs.js",
     "build:mac": "node scripts/build-dmg.js",
     "build:win": "node scripts/build-windows.js",

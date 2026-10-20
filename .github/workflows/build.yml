@@ -11,6 +11,7 @@ jobs:
     name: Unit Tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
         node-version: [18.x, 20.x]
@@ -70,6 +71,13 @@ jobs:
         with:
           node-version: 20.x
           cache: "npm"
+
+      - name: Ensure NSIS is installed
+        run: |
+          if (-not (Get-Command makensis -ErrorAction SilentlyContinue) -and -not (Test-Path "C:\Program Files (x86)\NSIS\makensis.exe")) {
+            choco install nsis -y --no-progress
+          }
+        shell: pwsh
 
       - name: Install dependencies
         run: npm ci
