@@ -1,66 +1,55 @@
 # Contributing to FloatCam
 
-Thank you for considering a contribution to FloatCam. This guide explains how to prepare a focused, reproducible change.
+Thank you for your interest in contributing to **FloatCam**! This document provides guidelines and instructions for contributing.
 
-## Development setup
+---
 
-### Requirements
+## 🛠️ Development Setup
 
-- Git
-- Node.js 18 or later
-- npm
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/username/FloatCam.git
+   cd FloatCam
+   ```
 
-### Clone and install
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-```bash
-git clone https://github.com/ydvkundan2005/FloatCam.git
-cd FloatCam
-npm ci
-```
+3. **Run in development mode**:
+   ```bash
+   npm start
+   ```
 
-Start the desktop application:
+4. **Run unit tests**:
+   ```bash
+   npm test
+   ```
 
-```bash
-npm start
-```
+---
 
-Run the repository's automated tests:
+## 🏗️ Architecture Guidelines
 
-```bash
-npm test
-```
+- **Zero Cloud Dependencies**: Video streaming is strictly point-to-point via WebRTC over the local Wi-Fi / LAN. Never introduce external relay or telemetry services without opt-in consensus.
+- **Lightweight Footprint**: Avoid heavy dependencies. Keep Electron bundle size and CPU/memory utilization minimal.
+- **Cross-Platform Compatibility**: Ensure features work predictably on macOS (menu bar, transparency, always-on-top) and Windows (system tray, acrylic/dark frame).
 
-The current test suite covers selected modules. A passing unit-test run does not by itself prove that camera permissions, WebRTC sessions, Electron windows, installers, or every phone/browser combination work end to end.
+---
 
-## Before opening an issue
+## 🧪 Testing Checklist
 
-For a reproducible bug report, include:
+Before submitting a pull request:
+- [ ] Run `npm test` to ensure all unit tests pass.
+- [ ] Verify both the menu bar / system tray popover and the floating camera window appear correctly.
+- [ ] Verify that opening the phone URL on a mobile device streams video smoothly without audio echo or lag.
+- [ ] Confirm no secrets, private keys, or generated files are staged (`git status`).
 
-- FloatCam version and installation method.
-- Desktop operating system and version.
-- Phone model and mobile browser, when relevant.
-- The smallest set of steps that reproduces the behavior.
-- Expected behavior and what happened instead.
-- Relevant error messages or redacted logs.
+---
 
-Remove personal information, private network details, tokens, certificates, and other secrets before sharing logs. Do not attach private camera footage.
+## 📦 Pull Request Process
 
-## Preparing a pull request
-
-1. Create a focused branch from `main`.
-2. Keep the change limited to one problem or improvement.
-3. Add or update tests when behavior changes.
-4. Run `npm test` and report the result accurately.
-5. Update the relevant documentation when setup, behavior, or limitations change.
-6. Describe the motivation, implementation, and manual verification performed.
-
-For platform-dependent changes, state which operating systems and devices you actually tested. Do not describe an untested platform as verified.
-
-## Security and privacy
-
-- Never commit credentials, private keys, certificates containing private key material, or personal camera data.
-- Do not ask users to publish secrets or sensitive logs in issues.
-- Treat local-network access as a deployment context, not as proof that traffic is confidential.
-- For a suspected security vulnerability, follow the reporting guidance in [the security documentation](docs/SECURITY.md) rather than posting exploit details publicly.
-
-Thank you for helping make FloatCam easier to use, review, and maintain.
+1. Create a feature branch from `main` (`git checkout -b feature/my-new-feature`).
+2. Commit your changes with clear, descriptive commit messages.
+3. Push to your branch and open a Pull Request.
+4. Describe the problem your change solves and include test instructions.
